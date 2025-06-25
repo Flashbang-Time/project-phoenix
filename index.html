@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Phoenix: QEMU Control</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a202c; /* Dark background */
+            color: #e2e8f0; /* Light text */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+            box-sizing: border-box; /* Ensure padding doesn't cause overflow */
+        }
+        .container {
+            background-color: #2d3748; /* Darker grey for container */
+            border-radius: 1.5rem; /* More rounded corners */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 900px; /* Max width for larger screens */
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        .control-group {
+            display: flex;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            gap: 1rem;
+            align-items: center;
+            justify-content: center; /* Center controls */
+        }
+        .button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .button-primary {
+            background-color: #48bb78; /* Green */
+            color: white;
+        }
+        .button-primary:hover {
+            background-color: #38a169;
+            transform: translateY(-2px);
+        }
+        .button-danger {
+            background-color: #ef4444; /* Red */
+            color: white;
+        }
+        .button-danger:hover {
+            background-color: #dc2626;
+            transform: translateY(-2px);
+        }
+        .button-secondary {
+            background-color: #63b3ed; /* Blue */
+            color: white;
+        }
+        .button-secondary:hover {
+            background-color: #4299e1;
+            transform: translateY(-2px);
+        }
+        select, input[type="number"] {
+            background-color: #4a5568; /* Darker grey inputs */
+            border: 1px solid #718096; /* Medium grey border */
+            color: #e2e8f0; /* Light text */
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            width: 100%; /* Full width on mobile */
+        }
+        select:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: #63b3ed; /* Blue on focus */
+            box-shadow: 0 0 0 2px rgba(99, 179, 237, 0.5); /* Blue ring shadow */
+        }
+        /* Responsive adjustments */
+        @media (min-width: 640px) { /* sm breakpoint */
+            .control-group {
+                justify-content: space-between; /* Space out controls on larger screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-4xl font-bold text-center mb-6 text-white">Project Phoenix: QEMU Control</h1>
+        <p class="text-gray-400 text-center mb-8">Manage your OS directly from a browser interface!</p>
+
+        <!-- VM Configuration Section -->
+        <div class="flex flex-col gap-6">
+            <h2 class="text-2xl font-semibold text-white">VM Configuration</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label for="ramInput" class="block text-sm font-medium text-gray-400 mb-1">RAM (MB)</label>
+                    <input type="number" id="ramInput" value="8192" min="512" max="32768" />
+                </div>
+                <div>
+                    <label for="coresInput" class="block text-sm font-medium text-gray-400 mb-1">CPU Cores</label>
+                    <input type="number" id="coresInput" value="6" min="1" max="12" />
+                </div>
+                <div>
+                    <label for="cpuModelSelect" class="block text-sm font-medium text-gray-400 mb-1">CPU Model</label>
+                    <select id="cpuModelSelect">
+                        <!-- Options populated by JavaScript -->
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- VM Control Buttons -->
+        <div class="flex flex-col gap-6 mt-4">
+            <h2 class="text-2xl font-semibold text-white">VM Actions</h2>
+            <div class="control-group">
+                <button id="startButton" class="button button-primary">
+                    <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.132l-3.393-2.394A1 1 0 0010 9.46v5.08a1 1 0 001.359.813l3.393-2.394a1 1 0 000-1.626z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Start VM
+                </button>
+                <button id="stopButton" class="button button-danger">
+                    <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H10a1 1 0 01-1-1v-4z"></path></svg>
+                    Stop VM
+                </button>
+            </div>
+        </div>
+
+        <div id="statusMessage" class="mt-6 p-3 rounded-md text-center text-sm bg-gray-700 text-gray-200">
+            VM Status: <span id="vmStatusText" class="font-semibold">Checking...</span>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-gray-700 text-center text-gray-500 text-xs">
+            <p><strong>To View Your VM:</strong> Connect a VNC client (like RealVNC Viewer) to localhost (127.0.0.1) with port 5900, so 127.0.0.1:5000.</p>
+            <p>Example: <span class="font-bold text-gray-400">192.168.X.X:5900</span> (replace with your phone's actual IP)</p>
+            <p class="mt-2">Developed By Flashbang Time | Project Phoenix</p>
+        </div>
+    </div>
+
+    <script>
+        const SERVER_URL = 'http://127.0.0.1:5000'; // Flask server URL
+
+        const ramInput = document.getElementById('ramInput');
+        const coresInput = document.getElementById('coresInput');
+        const cpuModelSelect = document.getElementById('cpuModelSelect');
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+        const vmStatusText = document.getElementById('vmStatusText');
+        const statusMessageDiv = document.getElementById('statusMessage');
+
+        // List of common QEMU CPU models (add more as desired based on your list)
+        const CPU_MODELS = [
+            "max", "qemu64", "Haswell-v4", "Skylake-Client-v4",
+            "GraniteRapids-v1", "Cascadelake-Server-v5", "EPYC-v4",
+            "Icelake-Server-v6", "SapphireRapids-v2"
+        ];
+
+        // Populate CPU model dropdown
+        CPU_MODELS.forEach(model => {
+            const option = document.createElement('option');
+            option.value = model;
+            option.textContent = model;
+            cpuModelSelect.appendChild(option);
+        });
+
+        // Fetch and set default values
+        async function fetchDefaults() {
+            try {
+                const response = await fetch(`${SERVER_URL}/get_defaults`);
+                const data = await response.json();
+                ramInput.value = data.default_ram_mb;
+                coresInput.value = data.default_cores;
+                cpuModelSelect.value = data.default_cpu_model;
+            } catch (error) {
+                console.error('Error fetching defaults:', error);
+                alertUser('Could not load default settings from server.', 'error');
+            }
+        }
+        fetchDefaults(); // Load defaults on page load
+
+        // Function to update VM status from the server
+        async function updateVmStatus() {
+            try {
+                const response = await fetch(`${SERVER_URL}/vm_status`);
+                const data = await response.json();
+                if (data.running) {
+                    vmStatusText.textContent = 'Running';
+                    vmStatusText.classList.remove('text-red-400', 'text-yellow-400');
+                    vmStatusText.classList.add('text-green-400');
+                    startButton.disabled = true;
+                    stopButton.disabled = false;
+                } else {
+                    vmStatusText.textContent = 'Stopped';
+                    vmStatusText.classList.remove('text-green-400', 'text-yellow-400');
+                    vmStatusText.classList.add('text-red-400');
+                    startButton.disabled = false;
+                    stopButton.disabled = true;
+                }
+            } catch (error) {
+                console.error('Error fetching VM status:', error);
+                vmStatusText.textContent = 'Error (Server Down?)';
+                vmStatusText.classList.remove('text-green-400', 'text-red-400');
+                vmStatusText.classList.add('text-yellow-400');
+                startButton.disabled = true; // Cannot control if server is down
+                stopButton.disabled = true;
+            }
+        }
+
+        // Event listener for Start button
+        startButton.addEventListener('click', async () => {
+            const ram_mb = parseInt(ramInput.value);
+            const cores = parseInt(coresInput.value);
+            const cpu_model = cpuModelSelect.value;
+
+            if (isNaN(ram_mb) || ram_mb < 512 || ram_mb > 32768) {
+                alertUser('Please enter valid RAM (512-32768 MB).', 'error');
+                return;
+            }
+            if (isNaN(cores) || cores < 1 || cores > 12) {
+                alertUser('Please enter valid CPU Cores (1-12).', 'error');
+                return;
+            }
+            if (!cpu_model) {
+                 alertUser('Please select a CPU Model.', 'error');
+                 return;
+            }
+
+            vmStatusText.textContent = 'Starting...';
+            vmStatusText.classList.remove('text-green-400', 'text-red-400');
+            vmStatusText.classList.add('text-yellow-400');
+            startButton.disabled = true;
+            stopButton.disabled = true;
+
+            try {
+                const response = await fetch(`${SERVER_URL}/start_vm`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ram_mb, cores, cpu_model })
+                });
+                const data = await response.json();
+                alertUser(data.message, data.status);
+            } catch (error) {
+                console.error("Fetch error:", error);
+                alertUser('Failed to connect to server to start VM.', 'error');
+            } finally {
+                setTimeout(updateVmStatus, 2000); // Give VM a moment to start and update status
+            }
+        });
+
+        // Event listener for Stop button
+        stopButton.addEventListener('click', async () => {
+            vmStatusText.textContent = 'Stopping...';
+            vmStatusText.classList.remove('text-green-400', 'text-red-400');
+            vmStatusText.classList.add('text-yellow-400');
+            startButton.disabled = true;
+            stopButton.disabled = true;
+
+            try {
+                const response = await fetch(`${SERVER_URL}/stop_vm`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                alertUser(data.message, data.status);
+            } catch (error) {
+                console.error("Fetch error:", error);
+                alertUser('Failed to connect to server to stop VM.', 'error');
+            } finally {
+                setTimeout(updateVmStatus, 1000); // Update status after a moment
+            }
+        });
+
+        // Simple alert function (replace with custom modal for production)
+        function alertUser(message, type) {
+            statusMessageDiv.textContent = message;
+            statusMessageDiv.className = `mt-6 p-3 rounded-md text-center text-sm ${
+                type === 'success' ? 'bg-green-700 text-white' :
+                type === 'error' ? 'bg-red-700 text-white' :
+                'bg-gray-700 text-gray-200'
+            }`;
+            // Revert message after a few seconds
+            setTimeout(() => {
+                statusMessageDiv.className = 'mt-6 p-3 rounded-md text-center text-sm bg-gray-700 text-gray-200';
+                statusMessageDiv.textContent = 'VM Status: ';
+                const statusSpan = document.createElement('span');
+                statusSpan.id = 'vmStatusText';
+                statusSpan.className = 'font-semibold';
+                statusMessageDiv.appendChild(statusSpan);
+                updateVmStatus(); // Refresh actual status
+            }, 5000);
+        }
+
+        // Initial status check when page loads
+        updateVmStatus();
+        // Periodically update status
+        setInterval(updateVmStatus, 5000); // Update every 5 seconds
+    </script>
+</body>
+</html>
