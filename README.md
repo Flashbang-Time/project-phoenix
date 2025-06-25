@@ -8,7 +8,7 @@ Place your Windows .qcow2 image here. For example, if your image is named Window
 cp /sdcard/Download/Windows_100G.qcow2 ~/windows_vm/
 Replace /sdcard/Download/ with the actual path where your image is located.3. Download Project Phoenix CodeNavigate to your home directory and clone the project repository (assuming you upload it to GitHub):cd ~
 # If you make your repo public, replace the URL below with your GitHub repo URL
-git clone https://github.com/YOUR_USERNAME/Project-Phoenix-QEMU-Control.git
+git clone https://github.com/Flashbang-Time/project-phoenix.git
 cd Project-Phoenix-QEMU-Control
 4. Install Python DependenciesInstall the required Python libraries for the Flask server:pip install Flask Flask-Cors
 5. Configure the QEMU Server ScriptOpen qemu_server_unified.py using a text editor (like nano or vi in Termux, or connect via ssh from your PC):nano qemu_server_unified.py
