@@ -1,23 +1,79 @@
 # Project Phoenix
 
-Project Phoenix: Mobile QEMU Windows VM Control PanelOverviewProject Phoenix is a robust and user-friendly web-based control panel designed to manage a QEMU-emulated Windows VM directly from your Android phone using Termux. This project streamlines the process of starting, stopping, and configuring a lightweight Windows operating system, making mobile virtualization more accessible and manageable.Inspired by the concept of "Limbo PC Emulator" but leveraging the full power of QEMU on Termux, Project Phoenix aims to provide a reliable and controllable Windows environment for specific tasks on a mobile device, complete with audio support.FeaturesDynamic VM Configuration: Adjust RAM (MB), CPU cores, and CPU model on the fly before launching your VM.Start/Stop Control: Simple web buttons to initiate and terminate the QEMU virtual machine.Real-time VM Status: See if your VM is running or stopped directly from the web interface.Terminal Output Logging: View QEMU and setup command logs directly in the browser for easy debugging.Local VNC Access: Connect any standard VNC client (e.g., RealVNC Viewer) to your phone's IP to view and interact with the Windows VM desktop.Audio Support: QEMU configured with PulseAudio for in-VM audio output.Setup Tools: Integrated buttons to create common directories (like /downloads/) and install necessary QEMU packages directly from the web UI.Self-contained Python Server: A single Python script handles the web server, QEMU management, and setup tasks.PrerequisitesBefore you begin, ensure your Android device (or Termux environment within an Android emulator like Bluestacks) meets the following requirements:Termux: Installed on your Android device. Download from F-Droid.Sufficient Storage: Your device needs ample free space for the Windows VM image (100GB+ recommended) and QEMU.Python 3: Termux will install this.QEMU for Termux: Specifically qemu-system-x86-64-headless.Windows VM Disk Image (.qcow2): A pre-installed Windows image in QEMU's .qcow2 format. (e.g., a lightweight Windows 10/11 build).VNC Client: A separate VNC viewer application on your phone/PC (e.g., RealVNC Viewer, VNC Viewer by Remotix) to connect to the VM's display.Good Cooling: Running a VM is CPU intensive and will generate significant heat.Installation StepsFollow these steps carefully in your Termux application.1. Initial Termux SetupOpen Termux and run these commands to update packages and grant necessary permissions:pkg update -y && pkg upgrade -y
-termux-setup-storage # Grant storage permission when prompted
-pkg install python git dbus build-essential -y
-2. Prepare Your Windows VM ImageYou need a QEMU-compatible .qcow2 image of a Windows OS. It's recommended to start with a lightweight Windows version.Create a VM directory:mkdir -p ~/windows_vm
-Place your Windows .qcow2 image here. For example, if your image is named Windows_100G.qcow2:# Assuming you've downloaded it to your phone's shared storage
-cp /sdcard/Download/Windows_100G.qcow2 ~/windows_vm/
-Replace /sdcard/Download/ with the actual path where your image is located.3. Download Project Phoenix CodeNavigate to your home directory and clone the project repository (assuming you upload it to GitHub):cd ~
-# If you make your repo public, replace the URL below with your GitHub repo URL
-git clone https://github.com/Flashbang-Time/project-phoenix.git
-cd Project-Phoenix-QEMU-Control
-4. Install Python DependenciesInstall the required Python libraries for the Flask server:pip install Flask Flask-Cors
-5. Configure the QEMU Server ScriptOpen qemu_server_unified.py using a text editor (like nano or vi in Termux, or connect via ssh from your PC):nano qemu_server_unified.py
-Find the BASE_QEMU_COMMAND variable and adjust the following:file= path: Make sure the path to your Windows_100G.qcow2 file is absolute and correct.Example: file=/data/data/com.termux/files/home/windows_vm/Windows_100G.qcow2cpu model: For optimal performance and heat management on Snapdragon, it's recommended to use a specific model rather than max.Change -cpu max to -cpu GraniteRapids-v1 or -cpu Skylake-Client-v4.Example: -vga virtio -cpu GraniteRapids-v1Save the file and exit the editor.6. Place the Web UI File (index.html)Ensure index.html is in the same directory as qemu_server_unified.py. (It should be if you cloned the repo).7. Start PulseAudio (for VM Audio)PulseAudio must be running in Termux for QEMU to output audio. Do this in a separate Termux session or background it carefully.# In a NEW Termux session:
-export XDG_RUNTIME_DIR=$(mktemp -d) # Crucial for PulseAudio
-pulseaudio --start
+Experience Full Windows on the Go!
+Project Phoenix is an innovative and highly optimized web-based control panel designed to bring the power of a Windows Virtual Machine directly to your Android phone, leveraging the robust capabilities of Termux. Forget bulky laptops or complex command-line interfaces; Project Phoenix streamlines VM management into an intuitive, touch-friendly web interface, making high-performance mobile virtualization a reality.
 
-# Verify PulseAudio is running (optional)
-pactl info
-# You should see "Server String: /data/data/com.termux/files/usr/tmp/pulseaudio_server" (or similar)
-Keep this Termux session running in the background.8. Run the Project Phoenix ServerIn your main Termux session (where your qemu_server_unified.py is located):python qemu_server_unified.py
-The server will start on http://0.0.0.0:5000.9. Access the Web InterfaceOpen your phone's web browser.Go to http://127.0.0.1:5000If 127.0.0.1 doesn't work: Find your phone's actual local IP address (e.g., 192.168.1.XX) in your Wi-Fi settings and use http://YOUR_PHONE_IP:5000.UsageVM Configuration: Use the input fields and dropdowns to set RAM, CPU Cores, and CPU Model.Start VM: Click the "Start VM" button. QEMU will launch in the background in your Termux session.Stop VM: Click the "Stop VM" button to gracefully terminate the QEMU process.VM Status: The web UI will show whether the VM is "Running" or "Stopped."Setup Tools:"Create Downloads Dir": Creates a ~/downloads/ directory in your Termux home."Install QEMU Headless": Installs the qemu-system-x86-64-headless package using pkg install. This can take a while.Setup Logs: Monitor the progress and output of these setup commands in the dedicated log box.Connecting to Your VM via VNCOnce the VM is running, you need a separate VNC client to see its display.Find your phone's local IP address (e.g., 192.168.1.XX) if you haven't already.Open your VNC client (e.g., RealVNC Viewer) on your phone or another device.Connect to: YOUR_PHONE_IP_ADDRESS:5900(Example: 192.168.1.10:5900)Important ConsiderationsPerformance: Running a full Windows VM on ARM (via Termux/QEMU) is a very CPU-intensive task. Performance will vary greatly depending on your phone's processor and the specific Windows build. Expect heat generation and potential slowdowns, even with optimizations.Battery Drain: Prolonged VM usage will significantly drain your phone's battery.Windows VM Optimization: For the best experience, use highly optimized or "Lite" versions of Windows designed for minimal resource consumption. Disable unnecessary services and visual effects within the VM.VNC Client Interaction: Interaction will be through the VNC client. The web UI is only for control.Security Warning (CRITICAL!)DO NOT make this server publicly accessible over the internet. This server does not have any authentication or robust security measures. If exposed, anyone could potentially:Execute arbitrary commands on your phone.Install malicious software.Perform denial-of-service attacks by constantly starting/stopping your VM.Access data on your phone.Keep Project Phoenix strictly confined to your local network.Future EnhancementsVNC Password Support: Add a password option for the VNC connection.Save/Load VM State: Implement QEMU snapshot features for quick save/restore.USB Passthrough Control: Add options to enable/disable USB device passthrough.Networking Options: More advanced network configurations.Improved Logging: Better categorization and persistent storage of logs.Enhanced UI Feedback: More detailed loading indicators and status updates.
+This project empowers you to boot, manage, and interact with a lightweight Windows operating system, perfect for specialized software, legacy applications, or simply enjoying a desktop environment on your mobile device. With built-in audio support and essential setup tools, Project Phoenix offers a comprehensive solution for mobile computing enthusiasts and power users.
+
+✨ Unleash Your Phone's Potential: Key Features
+Effortless VM Management: Start and stop your Windows VM with single-click simplicity directly from your web browser.
+
+Dynamic Configuration: Tailor your VM's performance by adjusting RAM (MB), CPU cores, and even selecting specific CPU models (like GraniteRapids-v1 for optimized performance on ARM processors) before each launch.
+
+Integrated Visuals & Audio: Experience your Windows desktop in real-time through an embedded VNC viewer (powered by noVNC) and enjoy clear audio output thanks to seamless PulseAudio integration.
+
+Live Status & Diagnostics: Keep an eye on your VM's operational status and review real-time QEMU logs and setup command outputs for straightforward troubleshooting.
+
+One-Click Setup Tools: Conveniently prepare your Termux environment with integrated buttons to:
+
+Create a dedicated ~/downloads/ directory for your VM files.
+
+Install the qemu-system-x86-64-headless package, automating complex Termux commands.
+
+Portable & Accessible: Control your VM from your phone's browser, or any device on your local network, transforming your Android device into a true mobile workstation.
+
+🛠️ Requirements & Setup: What You'll Need
+To get Project Phoenix soaring, ensure your Android device (or Termux environment within an emulator like Bluestacks) is ready:
+
+Termux App: Your indispensable Linux environment on Android. Download from F-Droid for stability.
+
+Ample Storage: A full Windows VM image requires substantial free space (100GB+).
+
+Sufficient RAM: For a usable Windows experience, your phone should ideally have 8GB or more of RAM.
+
+Windows VM Disk Image (.qcow2): A pre-installed, optimized Windows OS image in QEMU's .qcow2 format (lightweight/Lite builds recommended).
+
+QEMU for Termux: Specifically the qemu-system-x86-64-headless package (installable via the UI's setup tools).
+
+Python 3 & Dependencies: Handled automatically during setup.
+
+Good Cooling: Running a VM is CPU intensive and will generate significant heat.
+
+🚀 Quick Start (Detailed steps in README.md):
+Install Termux & Essentials: pkg update && pkg upgrade -y, termux-setup-storage, pkg install python git dbus build-essential -y.
+
+Prepare VM Image: Create ~/windows_vm and copy your YourWindowsVM.qcow2 there.
+
+Clone Project Phoenix: git clone [YOUR_REPO_URL] && cd Project-Phoenix-QEMU-Control.
+
+Install Python Libs: pip install Flask Flask-Cors websockets.
+
+Configure QEMU Command: Edit qemu_server_unified.py to set your VM image path and preferred CPU model (e.g., -cpu GraniteRapids-v1).
+
+Download noVNC Local Files: curl novnc.js and util.js into a static folder within your project.
+
+Start PulseAudio: In a new Termux session: export XDG_RUNTIME_DIR=$(mktemp -d); pulseaudio --start.
+
+Run Server: In your main Termux session: python qemu_server_unified.py.
+
+Access UI: Open http://127.0.0.1:5000 in your phone's browser.
+
+⚠️ Important Disclaimers & Security Information
+Performance: Expect performance limitations. QEMU on ARM uses software emulation (TCG) for x86 instructions, which is inherently slower than native hardware virtualization. While optimized, it won't match a dedicated PC.
+
+Heat & Battery: High CPU load will cause significant device heating and rapid battery drain. Use in a well-ventilated area or while charging.
+
+VM Optimization is KEY: The responsiveness of your VM is highly dependent on the Windows image itself. Use "Lite" versions, disable unnecessary services, and optimize settings within Windows.
+
+Security (CRITICAL!):
+
+This server lacks authentication and robust security measures.
+
+NEVER expose this server to the public internet via port forwarding or similar methods.
+
+Doing so would allow unauthorized users to potentially execute arbitrary commands on your phone, install malicious software, or perform denial-of-service attacks.
+
+Keep Project Phoenix strictly confined to your local network (e.g., Wi-Fi).
+
+💡 Future Visions
+Project Phoenix is continuously evolving! Ideas for future enhancements include: VNC password protection, QEMU snapshot management, advanced networking configurations, and improved UI/UX for a seamless experience.
