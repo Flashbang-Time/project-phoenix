@@ -62,11 +62,17 @@ rm web.py
 using any text editor of your choice open web.py from your file explorer and in the
 
 BASE_QEMU_COMMAND = (
+
     "/data/data/com.termux/files/usr/bin/qemu-system-x86_64 "
+    
     "-smp {cores} -m {ram_mb} "
+    
     "-drive file=/data/data/com.termux/files/home/downloads/os.qcow2,if=ide,cache=writeback,aio=threads "
+    
     "-netdev user,id=net0 -device virtio-net-pci,netdev=net0 "
+    
     "-vga virtio -cpu {cpu_model} "
+    
     "-vnc 0.0.0.0:0"
 )
 
@@ -75,18 +81,25 @@ Add a line called "-cdrom virtio-win-0.1.271.iso"
 So it'll be like this
 
 BASE_QEMU_COMMAND = (
+
     "/data/data/com.termux/files/usr/bin/qemu-system-x86_64 "
+    
     "-smp {cores} -m {ram_mb} "
+    
     "-drive file=/data/data/com.termux/files/home/downloads/os.qcow2,if=ide,cache=writeback,aio=threads "
+    
     "-netdev user,id=net0 -device virtio-net-pci,netdev=net0 "
+    
     "-vga virtio -cpu {cpu_model} "
+    
     "-vnc 0.0.0.0:0"
-    "-cdrom virtio-win-0.1.271.iso"
+    
+    "-cdrom virtio-win-0.1.271.iso"    
 )
 
 After editing it reimport the file into termux using step 1C.
 
-Again, execute
+Again, execute:
 
 cd downloads
 
