@@ -53,6 +53,7 @@ This project empowers you to boot, manage, and interact with a lightweight Windo
 1D. Using any VNC app, connect to 127.0.0.1:5900
 
 💡 INSTALLING DRIVERS
+
 If you are on Windows, make sure to install the Drivers provided in the repo, here's how to:
 
 cd downloads (if not already in the downloads directory)
