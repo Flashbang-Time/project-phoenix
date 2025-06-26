@@ -5,44 +5,60 @@ Project Phoenix is an innovative and highly optimized web-based control panel de
 
 This project empowers you to boot, manage, and interact with a lightweight Windows operating system, perfect for specialized software, legacy applications, or simply enjoying a desktop environment on your mobile device. With built-in audio support and essential setup tools, Project Phoenix offers a comprehensive solution for mobile computing enthusiasts and power users.
 
-⚠️ PREREQUISITES:
+⚠️ PREREQUISITES
 
 1A. some mental capacity
+
 2A. a brain
+
 3A. an android phone
+
 4A. termux
+
 5A. INPORTANT check step 2C
 
-💡 HOW TO INSTALL:
+💡 HOW TO INSTALL
 
 1B. Open Termux (downloaded from FDroid) 
-2B. Now execute the following commands: 
+
+2B. Now execute the following commands
+
 3B. apt update, apt upgrade
+
 4B. apt install qemu-common
+
 5B. apt install qemu-system-x86-64-headless
+
 6B. apt install python (if not installed already)
+
 7B. pip install flask
+
 8B. pip install flask_cors
 
-💡 FIRST SETUP:
+
+💡 FIRST SETUP
 
 1C. Import the web.py, index.html and os image using your file manager (just open the files with termux and import them into the default [downloads] folder)
+
 2C. MAKE SURE YOUR OS IMAGE IS CALLED os.qcow2 OTHERWISE THE VM WON'T BOOT
+
 3C. Execute these commands:
    cd downloads
    pyhton web.py
 
 4C. If everything went well, you should be able to access the web interface using 127.0.0.1:5000 on any browser
 
-💡 USING THE VM:
+💡 USING THE VM
 
 1D. Using any VNC app, connect to 127.0.0.1:5900
 
-💡 INSTALLING DRIVERS:
+💡 INSTALLING DRIVERS
 If you are on Windows, make sure to install the Drivers provided in the repo, here's how to:
 
 cd downloads (if not already in the downloads directory)
+
 rm web.py
+
 using any text editor of your choice open web.py from your file explorer and in the
 
 BASE_QEMU_COMMAND = (
@@ -55,7 +71,8 @@ BASE_QEMU_COMMAND = (
 )
 
 Add a line called "-cdrom virtio-win-0.1.271.iso"
-So it'll be like this:
+
+So it'll be like this
 
 BASE_QEMU_COMMAND = (
     "/data/data/com.termux/files/usr/bin/qemu-system-x86_64 "
@@ -68,8 +85,11 @@ BASE_QEMU_COMMAND = (
 )
 
 After editing it reimport the file into termux using step 1C.
-Again, execute:
+
+Again, execute
+
 cd downloads
+
 python web.py
 
 After boot, go into device manager and install the drivers like any human being.
