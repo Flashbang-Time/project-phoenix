@@ -5,58 +5,71 @@ Project Phoenix is an innovative and highly optimized web-based control panel de
 
 This project empowers you to boot, manage, and interact with a lightweight Windows operating system, perfect for specialized software, legacy applications, or simply enjoying a desktop environment on your mobile device. With built-in audio support and essential setup tools, Project Phoenix offers a comprehensive solution for mobile computing enthusiasts and power users.
 
-✨ Unleash Your Phone's Potential: Key Features
-Effortless VM Management: Start and stop your Windows VM with single-click simplicity directly from your web browser.
+⚠️ PREREQUISITES:
+1A. some mental capacity
+2A. a brain
+3A. an android phone
+4A. termux
+5A. INPORTANT check step 2C
 
-Dynamic Configuration: Tailor your VM's performance by adjusting RAM (MB), CPU cores, and even selecting specific CPU models (like GraniteRapids-v1 for optimized performance on ARM processors) before each launch.
+💡 HOW TO INSTALL:
+1B. Open Termux (downloaded from FDroid) 
+2B. Now execute the following commands: 
+3B. apt update, apt upgrade
+4B. apt install qemu-common
+5B. apt install qemu-system-x86-64-headless
+6B. apt install python (if not installed already)
+7B. pip install flask
+8B. pip install flask_cors
 
-Integrated Visuals & Audio: Experience your Windows desktop in real-time through an embedded VNC viewer (powered by noVNC) and enjoy clear audio output thanks to seamless PulseAudio integration.
+💡 FIRST SETUP:
+1C. Import the web.py, index.html and os image using your file manager (just open the files with termux and import them into the default [downloads] folder)
+2C. MAKE SURE YOUR OS IMAGE IS CALLED os.qcow2 OTHERWISE THE VM WON'T BOOT
+3C. Execute these commands:
+   cd downloads
+   pyhton web.py
 
-Live Status & Diagnostics: Keep an eye on your VM's operational status and review real-time QEMU logs and setup command outputs for straightforward troubleshooting.
+4C. If everything went well, you should be able to access the web interface using 127.0.0.1:5000 on any browser
 
-One-Click Setup Tools: Conveniently prepare your Termux environment with integrated buttons to:
+💡 USING THE VM:
+1D. Using any VNC app, connect to 127.0.0.1:5900
 
-Create a dedicated ~/downloads/ directory for your VM files.
+💡 INSTALLING DRIVERS:
+If you are on Windows, make sure to install the Drivers provided in the repo, here's how to:
 
-Install the qemu-system-x86-64-headless package, automating complex Termux commands.
+cd downloads (if not already in the downloads directory)
+rm web.py
+using any text editor of your choice open web.py from your file explorer and in the
 
-Portable & Accessible: Control your VM from your phone's browser, or any device on your local network, transforming your Android device into a true mobile workstation.
+BASE_QEMU_COMMAND = (
+    "/data/data/com.termux/files/usr/bin/qemu-system-x86_64 "
+    "-smp {cores} -m {ram_mb} "
+    "-drive file=/data/data/com.termux/files/home/downloads/os.qcow2,if=ide,cache=writeback,aio=threads "
+    "-netdev user,id=net0 -device virtio-net-pci,netdev=net0 "
+    "-vga virtio -cpu {cpu_model} "
+    "-vnc 0.0.0.0:0"
+)
 
-🛠️ Requirements & Setup: What You'll Need
-To get Project Phoenix soaring, ensure your Android device (or Termux environment within an emulator like Bluestacks) is ready:
+Add a line called "-cdrom virtio-win-0.1.271.iso"
+So it'll be like this:
 
-Termux App: Your indispensable Linux environment on Android. Download from F-Droid for stability.
+BASE_QEMU_COMMAND = (
+    "/data/data/com.termux/files/usr/bin/qemu-system-x86_64 "
+    "-smp {cores} -m {ram_mb} "
+    "-drive file=/data/data/com.termux/files/home/downloads/os.qcow2,if=ide,cache=writeback,aio=threads "
+    "-netdev user,id=net0 -device virtio-net-pci,netdev=net0 "
+    "-vga virtio -cpu {cpu_model} "
+    "-vnc 0.0.0.0:0"
+    "-cdrom virtio-win-0.1.271.iso"
+)
 
-Ample Storage: A full Windows VM image requires substantial free space (100GB+).
+After editing it reimport the file into termux using step 1C.
+Again, execute:
+cd downloads
+python web.py
 
-Sufficient RAM: For a usable Windows experience, your phone should ideally have 8GB or more of RAM.
+After boot, go into device manager and install the drivers like any human being.
 
-Windows VM Disk Image (.qcow2): A pre-installed, optimized Windows OS image in QEMU's .qcow2 format (lightweight/Lite builds recommended).
-
-QEMU for Termux: Specifically the qemu-system-x86-64-headless package (installable via the UI's setup tools).
-
-Python 3 & Dependencies: Handled automatically during setup.
-
-Good Cooling: Running a VM is CPU intensive and will generate significant heat.
-
-🚀 Quick Start (Detailed steps in README.md):
-Install Termux & Essentials: pkg update && pkg upgrade -y, termux-setup-storage, pkg install python git dbus build-essential -y.
-
-Prepare VM Image: Create ~/windows_vm and copy your YourWindowsVM.qcow2 there.
-
-Clone Project Phoenix: git clone [YOUR_REPO_URL] && cd Project-Phoenix-QEMU-Control.
-
-Install Python Libs: pip install Flask Flask-Cors websockets.
-
-Configure QEMU Command: Edit qemu_server_unified.py to set your VM image path and preferred CPU model (e.g., -cpu GraniteRapids-v1).
-
-Download noVNC Local Files: curl novnc.js and util.js into a static folder within your project.
-
-Start PulseAudio: In a new Termux session: export XDG_RUNTIME_DIR=$(mktemp -d); pulseaudio --start.
-
-Run Server: In your main Termux session: python qemu_server_unified.py.
-
-Access UI: Open http://127.0.0.1:5000 in your phone's browser.
 
 ⚠️ Important Disclaimers & Security Information
 Performance: Expect performance limitations. QEMU on ARM uses software emulation (TCG) for x86 instructions, which is inherently slower than native hardware virtualization. While optimized, it won't match a dedicated PC.
