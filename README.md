@@ -15,7 +15,7 @@ This project empowers you to boot, manage, and interact with a lightweight Windo
 
 4A. termux
 
-5A. INPORTANT check step 2C
+5A. IMPORTANT check step 2C
 
 💡 HOW TO INSTALL
 
