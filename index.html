@@ -6,169 +6,234 @@
     <title>Project Phoenix: QEMU Control</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (Inter) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
+        /* General body styling */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #1a202c; /* Dark background */
+            background-color: #111827; /* Even darker blue-gray */
             color: #e2e8f0; /* Light text */
             display: flex;
-            justify-content: center;
+            flex-direction: column; /* Allow scrolling for multiple containers */
             align-items: center;
             min-height: 100vh;
-            padding: 1rem;
-            box-sizing: border-box; /* Ensure padding doesn't cause overflow */
+            padding: 1.5rem;
+            box-sizing: border-box;
         }
+        /* Main container for controls */
         .container {
-            background-color: #2d3748; /* Darker grey for container */
-            border-radius: 1.5rem; /* More rounded corners */
+            background-color: #1f2937; /* Darker grey for container */
+            border-radius: 1rem;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
-            padding: 2.5rem;
+            padding: 2rem;
             width: 100%;
-            max-width: 900px; /* Max width for larger screens */
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
+            max-width: 900px;
+            margin-bottom: 2rem; /* Space between containers */
         }
-        .control-group {
-            display: flex;
-            flex-wrap: wrap; /* Allow wrapping on smaller screens */
-            gap: 1rem;
-            align-items: center;
-            justify-content: center; /* Center controls */
+        /* Style for disabled buttons */
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none; /* Disable hover transform */
         }
-        .button {
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.75rem;
-            font-weight: 600;
-            transition: all 0.2s ease-in-out;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-        .button-primary {
-            background-color: #48bb78; /* Green */
-            color: white;
-        }
-        .button-primary:hover {
-            background-color: #38a169;
-            transform: translateY(-2px);
-        }
-        .button-danger {
-            background-color: #ef4444; /* Red */
-            color: white;
-        }
-        .button-danger:hover {
-            background-color: #dc2626;
-            transform: translateY(-2px);
-        }
-        .button-secondary {
-            background-color: #63b3ed; /* Blue */
-            color: white;
-        }
-        .button-secondary:hover {
-            background-color: #4299e1;
-            transform: translateY(-2px);
-        }
-        select, input[type="number"] {
-            background-color: #4a5568; /* Darker grey inputs */
-            border: 1px solid #718096; /* Medium grey border */
-            color: #e2e8f0; /* Light text */
+        /* Custom input styling for better dark mode appearance */
+        select, input[type="number"], input[type="text"] {
+            background-color: #374151; /* Gray-700 */
+            border: 1px solid #4b5563; /* Gray-600 */
+            color: #f3f4f6; /* Gray-100 */
             padding: 0.75rem 1rem;
             border-radius: 0.5rem;
-            width: 100%; /* Full width on mobile */
+            width: 100%;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
-        select:focus, input[type="number"]:focus {
+        select:focus, input:focus {
             outline: none;
-            border-color: #63b3ed; /* Blue on focus */
-            box-shadow: 0 0 0 2px rgba(99, 179, 237, 0.5); /* Blue ring shadow */
+            border-color: #ef4444; /* Red-500 */
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.4);
         }
-        /* Responsive adjustments */
-        @media (min-width: 640px) { /* sm breakpoint */
-            .control-group {
-                justify-content: space-between; /* Space out controls on larger screens */
-            }
+        /* Log box for terminal output */
+        .log-box {
+            background-color: #111827;
+            border: 1px solid #374151;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            height: 250px;
+            overflow-y: scroll;
+            font-family: 'monospace';
+            font-size: 0.875rem;
+            color: #9ca3af; /* Gray-400 */
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
+        .log-box span.error { color: #f87171; } /* red-400 */
+        .log-box span.success { color: #4ade80; } /* green-400 */
+        .log-box span.info { color: #60a5fa; } /* blue-400 */
+        .log-box span.command { color: #f3f4f6; font-weight: bold; } /* gray-100 */
+        .log-box span.status { color: #6b7280; } /* gray-500 */
     </style>
 </head>
-<body>
+<body class="bg-gray-900 text-gray-100">
+
+    <!-- Main Control Panel Container -->
     <div class="container">
-        <h1 class="text-4xl font-bold text-center mb-6 text-white">Project Phoenix: QEMU Control</h1>
-        <p class="text-gray-400 text-center mb-8">Manage your OS directly from a browser interface!</p>
+        <!-- Centered Image with inline CSS -->
+        <img src="https://cdn.discordapp.com/attachments/1047608068659224648/1388179605604663468/Your_paragraph_text.png?ex=68600a81&is=685eb901&hm=8877f93ee180aacabfd9064409ff7c596f79fc05e92cba72b0b6fac0e5cf09b3&"
+             style="display: block; margin: auto; max-width: 100%; height: auto; border-radius: 0.5rem; margin-bottom: 1rem;"
+             alt="Project Phoenix Logo">
+        <p class="text-gray-400 text-center mb-8">QEMU & Termux Control Panel</p>
 
-        <!-- VM Configuration Section -->
-        <div class="flex flex-col gap-6">
-            <h2 class="text-2xl font-semibold text-white">VM Configuration</h2>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- VM Core Settings Section -->
+        <div class="mb-8 p-6 bg-gray-800 rounded-lg shadow-inner">
+            <h2 class="text-2xl font-semibold text-white mb-4 border-b border-gray-700 pb-2">Core VM Settings</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                    <label for="ramInput" class="block text-sm font-medium text-gray-400 mb-1">RAM (MB)</label>
+                    <label for="ramInput" class="block text-sm font-medium text-gray-400 mb-2">RAM (MB)</label>
                     <input type="number" id="ramInput" value="8192" min="512" max="32768" />
                 </div>
                 <div>
-                    <label for="coresInput" class="block text-sm font-medium text-gray-400 mb-1">CPU Cores</label>
+                    <label for="coresInput" class="block text-sm font-medium text-gray-400 mb-2">CPU Cores</label>
                     <input type="number" id="coresInput" value="6" min="1" max="12" />
                 </div>
                 <div>
-                    <label for="cpuModelSelect" class="block text-sm font-medium text-gray-400 mb-1">CPU Model</label>
-                    <select id="cpuModelSelect">
-                        <!-- Options populated by JavaScript -->
-                    </select>
+                    <label for="cpuModelSelect" class="block text-sm font-medium text-gray-400 mb-2">CPU Model</label>
+                    <select id="cpuModelSelect"></select>
                 </div>
             </div>
         </div>
 
-        <!-- VM Control Buttons -->
-        <div class="flex flex-col gap-6 mt-4">
-            <h2 class="text-2xl font-semibold text-white">VM Actions</h2>
-            <div class="control-group">
-                <button id="startButton" class="button button-primary">
-                    <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.132l-3.393-2.394A1 1 0 0010 9.46v5.08a1 1 0 001.359.813l3.393-2.394a1 1 0 000-1.626z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Start VM
-                </button>
-                <button id="stopButton" class="button button-danger">
-                    <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H10a1 1 0 01-1-1v-4z"></path></svg>
-                    Stop VM
-                </button>
+        <!-- Storage Settings Section -->
+        <div class="mb-8 p-6 bg-gray-800 rounded-lg shadow-inner">
+            <h2 class="text-2xl font-semibold text-white mb-4 border-b border-gray-700 pb-2">Storage</h2>
+            <div class="grid grid-cols-1 gap-6">
+                <div>
+                    <label for="primaryDiskPathInput" class="block text-sm font-medium text-gray-400 mb-2">Primary Disk Image Path (.qcow2)</label>
+                    <input type="text" id="primaryDiskPathInput" placeholder="Windows_100G.qcow2" />
+                    <p class="text-xs text-gray-500 mt-1">e.g., win10.qcow2</p>
+                </div>
+                <div>
+                    <label for="cdromPathInput" class="block text-sm font-medium text-gray-400 mb-2">CD-ROM / ISO Path (Optional)</label>
+                    <input type="text" id="cdromPathInput" placeholder="win10.iso" />
+                    <p class="text-xs text-gray-500 mt-1">e.g., installer.iso</p>
+                </div>
+                <div>
+                    <label for="dataDiskPathInput" class="block text-sm font-medium text-gray-400 mb-2">Secondary Data Disk Path (.qcow2 - Optional)</label>
+                    <input type="text" id="dataDiskPathInput" placeholder="data.qcow2" />
+                    <p class="text-xs text-gray-500 mt-1">e.g., data_drive.qcow2</p>
+                </div>
             </div>
         </div>
 
-        <div id="statusMessage" class="mt-6 p-3 rounded-md text-center text-sm bg-gray-700 text-gray-200">
-            VM Status: <span id="vmStatusText" class="font-semibold">Checking...</span>
+        <!-- Network & Display Settings Section -->
+        <div class="mb-8 p-6 bg-gray-800 rounded-lg shadow-inner">
+            <h2 class="text-2xl font-semibold text-white mb-4 border-b border-gray-700 pb-2">Network & Display</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="netDeviceSelect" class="block text-sm font-medium text-gray-400 mb-2">Network Device Model</label>
+                    <select id="netDeviceSelect"></select>
+                    <p class="text-xs text-gray-500 mt-1">VirtIO recommended for performance (needs guest drivers).</p>
+                </div>
+                <div>
+                    <label for="vgaModelSelect" class="block text-sm font-medium text-gray-400 mb-2">VGA Display Model</label>
+                    <select id="vgaModelSelect"></select>
+                    <p class="text-xs text-gray-500 mt-1">VirtIO recommended for performance (needs guest drivers).</p>
+                </div>
+                <div>
+                    <label for="bootOrderSelect" class="block text-sm font-medium text-gray-400 mb-2">Boot Order</label>
+                    <select id="bootOrderSelect"></select>
+                    <p class="text-xs text-gray-500 mt-1">c=Hard Disk, d=CD-ROM, n=Network.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Control Buttons -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+            <button id="startButton" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-50 transition duration-200 ease-in-out shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                Start VM
+            </button>
+            <button id="stopButton" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:ring-4 focus:ring-red-500 focus:ring-opacity-50 transition duration-200 ease-in-out shadow-lg hover:shadow-xl transform hover:-translate-y-1" disabled>
+                Stop VM
+            </button>
+        </div>
+
+        <!-- Status Message Area -->
+        <div id="statusMessage" class="mt-6 p-4 rounded-lg text-center font-semibold bg-gray-800 text-gray-300 transition-colors duration-300">
+            VM Status: <span id="vmStatusText" class="font-bold">Checking...</span>
         </div>
 
         <div class="mt-6 pt-4 border-t border-gray-700 text-center text-gray-500 text-xs">
-            <p><strong>To View Your VM:</strong> Connect a VNC client (like RealVNC Viewer) to localhost (127.0.0.1) with port 5900, so 127.0.0.1:5000.</p>
-            <p>Example: <span class="font-bold text-gray-400">127.0.0.1:5900</span></p>
-            <p class="mt-2">Developed By Flashbang Time | Project Phoenix</p>
+            <p><strong>Note:</strong> Connect your external VNC client to <strong>127.0.0.1:5900</strong></p>
         </div>
     </div>
 
+    <!-- Terminal Container -->
+    <div class="container">
+        <h2 class="text-2xl font-semibold text-white text-center mb-4">Local Command Terminal</h2>
+        <div id="terminalOutput" class="log-box">
+            <span>Welcome to Project Phoenix Terminal. Type a command and press Enter or click 'Run Command'.</span><br>
+            <span>⚠️ WARNING: Commands are executed directly on your Termux system. Use with caution!</span><br>
+        </div>
+        <div class="flex flex-col md:flex-row gap-4 mt-4">
+            <input type="text" id="terminalInput" placeholder="Enter command (e.g., ls -l, pwd)..." class="flex-grow" />
+            <button id="runCommandBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200 ease-in-out shadow-md hover:shadow-lg">
+                Run
+            </button>
+        </div>
+        <div class="mt-4 text-center text-gray-500 text-xs">
+            <p>QEMU and server logs should appear here, maybe :).</p>
+        </div>
+    </div>
+
+    <!-- Main JavaScript Logic -->
     <script>
+        // --- Core Constants and DOM Elements ---
         const SERVER_URL = 'http://127.0.0.1:5000'; // Flask server URL
 
         const ramInput = document.getElementById('ramInput');
         const coresInput = document.getElementById('coresInput');
         const cpuModelSelect = document.getElementById('cpuModelSelect');
+        const primaryDiskPathInput = document.getElementById('primaryDiskPathInput');
+        const cdromPathInput = document.getElementById('cdromPathInput');
+        const dataDiskPathInput = document.getElementById('dataDiskPathInput');
+        const netDeviceSelect = document.getElementById('netDeviceSelect');
+        const vgaModelSelect = document.getElementById('vgaModelSelect');
+        const bootOrderSelect = document.getElementById('bootOrderSelect');
+
         const startButton = document.getElementById('startButton');
         const stopButton = document.getElementById('stopButton');
-        const vmStatusText = document.getElementById('vmStatusText');
+        let vmStatusText = document.getElementById('vmStatusText'); // Needs 'let' as its reference is updated
+
         const statusMessageDiv = document.getElementById('statusMessage');
+        const terminalOutput = document.getElementById('terminalOutput');
+        const terminalInput = document.getElementById('terminalInput');
+        const runCommandBtn = document.getElementById('runCommandBtn');
 
-        // List of common QEMU CPU models (add more as desired based on your list)
-        const CPU_MODELS = [
-            "max", "qemu64", "Haswell-v4", "Skylake-Client-v4",
-            "GraniteRapids-v1", "Cascadelake-Server-v5", "EPYC-v4",
-            "Icelake-Server-v6", "SapphireRapids-v2"
-        ];
+        // Lists for dropdowns
+        const CPU_MODELS = ["max", "qemu64", "host", "Haswell-v4", "Skylake-Client-v4",
+                            "GraniteRapids-v1", "Cascadelake-Server-v5", "EPYC-v4",
+                            "Icelake-Server-v6", "SapphireRapids-v2"];
+        const NET_DEVICES = ["virtio-net-pci", "e1000", "rtl8139"];
+        const VGA_MODELS = ["virtio", "std", "qxl", "vmware", "cirrus"];
+        const BOOT_ORDERS = ["c", "d", "n", "cd", "dc", "ncd", "dcn"];
 
-        // Populate CPU model dropdown
-        CPU_MODELS.forEach(model => {
-            const option = document.createElement('option');
-            option.value = model;
-            option.textContent = model;
-            cpuModelSelect.appendChild(option);
-        });
+        // --- Initialization: Populate Dropdowns ---
+        function populateDropdown(selectElement, optionsArray) {
+            selectElement.innerHTML = ''; // Clear existing options
+            optionsArray.forEach(optionText => {
+                const option = document.createElement('option');
+                option.value = optionText;
+                option.textContent = optionText;
+                selectElement.appendChild(option);
+            });
+        }
 
-        // Fetch and set default values
+        populateDropdown(cpuModelSelect, CPU_MODELS);
+        populateDropdown(netDeviceSelect, NET_DEVICES);
+        populateDropdown(vgaModelSelect, VGA_MODELS);
+        populateDropdown(bootOrderSelect, BOOT_ORDERS);
+
+        // --- Fetch Default VM Config ---
         async function fetchDefaults() {
             try {
                 const response = await fetch(`${SERVER_URL}/get_defaults`);
@@ -176,14 +241,20 @@
                 ramInput.value = data.default_ram_mb;
                 coresInput.value = data.default_cores;
                 cpuModelSelect.value = data.default_cpu_model;
+                primaryDiskPathInput.value = data.default_primary_disk_path;
+                cdromPathInput.value = data.default_cdrom_path;
+                dataDiskPathInput.value = data.default_data_disk_path;
+                netDeviceSelect.value = data.default_net_device;
+                vgaModelSelect.value = data.default_vga_model;
+                bootOrderSelect.value = data.default_boot_order;
             } catch (error) {
                 console.error('Error fetching defaults:', error);
-                alertUser('Could not load default settings from server.', 'error');
+                alertUser('Could not load default settings from server. Using fallback defaults.', 'error');
             }
         }
-        fetchDefaults(); // Load defaults on page load
+        fetchDefaults(); // Load defaults on startup
 
-        // Function to update VM status from the server
+        // --- VM Status & Control ---
         async function updateVmStatus() {
             try {
                 const response = await fetch(`${SERVER_URL}/vm_status`);
@@ -202,37 +273,36 @@
                     stopButton.disabled = true;
                 }
             } catch (error) {
-                console.error('Error fetching VM status:', error);
+                console.error('Error fetching VM status (server potentially down):', error);
                 vmStatusText.textContent = 'Error (Server Down?)';
                 vmStatusText.classList.remove('text-green-400', 'text-red-400');
                 vmStatusText.classList.add('text-yellow-400');
-                startButton.disabled = true; // Cannot control if server is down
+                startButton.disabled = true;
                 stopButton.disabled = true;
             }
         }
 
-        // Event listener for Start button
+        // --- VM Control Event Listeners ---
         startButton.addEventListener('click', async () => {
-            const ram_mb = parseInt(ramInput.value);
-            const cores = parseInt(coresInput.value);
-            const cpu_model = cpuModelSelect.value;
+            const config = {
+                ram_mb: parseInt(ramInput.value),
+                cores: parseInt(coresInput.value),
+                cpu_model: cpuModelSelect.value,
+                primary_disk_path: primaryDiskPathInput.value.trim(),
+                cdrom_path: cdromPathInput.value.trim(),
+                data_disk_path: dataDiskPathInput.value.trim(),
+                net_device: netDeviceSelect.value,
+                vga_model: vgaModelSelect.value,
+                boot_order: bootOrderSelect.value
+            };
 
-            if (isNaN(ram_mb) || ram_mb < 512 || ram_mb > 32768) {
-                alertUser('Please enter valid RAM (512-32768 MB).', 'error');
-                return;
-            }
-            if (isNaN(cores) || cores < 1 || cores > 12) {
-                alertUser('Please enter valid CPU Cores (1-12).', 'error');
-                return;
-            }
-            if (!cpu_model) {
-                 alertUser('Please select a CPU Model.', 'error');
-                 return;
-            }
+            // Basic client-side validation (server will also validate)
+            if (isNaN(config.ram_mb) || config.ram_mb < 512 || config.ram_mb > 32768) { alertUser('Please enter valid RAM (512-32768 MB).', 'error'); return; }
+            if (isNaN(config.cores) || config.cores < 1 || config.cores > 12) { alertUser('Please enter valid CPU Cores (1-12).', 'error'); return; }
+            if (!config.primary_disk_path) { alertUser('Primary Disk Path is required.', 'error'); return; }
+            // Add more client-side validation if desired
 
-            vmStatusText.textContent = 'Starting...';
-            vmStatusText.classList.remove('text-green-400', 'text-red-400');
-            vmStatusText.classList.add('text-yellow-400');
+            alertUser('Starting VM...', 'info');
             startButton.disabled = true;
             stopButton.disabled = true;
 
@@ -240,65 +310,121 @@
                 const response = await fetch(`${SERVER_URL}/start_vm`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ ram_mb, cores, cpu_model })
+                    body: JSON.stringify(config)
                 });
                 const data = await response.json();
                 alertUser(data.message, data.status);
             } catch (error) {
-                console.error("Fetch error:", error);
-                alertUser('Failed to connect to server to start VM.', 'error');
+                console.error("Start VM fetch error:", error);
+                alertUser('Failed to send start command to server. Server unreachable?', 'error');
             } finally {
-                setTimeout(updateVmStatus, 2000); // Give VM a moment to start and update status
+                setTimeout(updateVmStatus, 2000); // Poll status after delay
             }
         });
 
-        // Event listener for Stop button
         stopButton.addEventListener('click', async () => {
-            vmStatusText.textContent = 'Stopping...';
-            vmStatusText.classList.remove('text-green-400', 'text-red-400');
-            vmStatusText.classList.add('text-yellow-400');
+            alertUser('Stopping VM...', 'warning');
             startButton.disabled = true;
             stopButton.disabled = true;
 
             try {
-                const response = await fetch(`${SERVER_URL}/stop_vm`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
-                });
+                const response = await fetch(`${SERVER_URL}/stop_vm`, { method: 'POST' });
                 const data = await response.json();
                 alertUser(data.message, data.status);
             } catch (error) {
-                console.error("Fetch error:", error);
-                alertUser('Failed to connect to server to stop VM.', 'error');
+                console.error("Stop VM fetch error:", error);
+                alertUser('Failed to send stop command to server. Server unreachable?', 'error');
             } finally {
-                setTimeout(updateVmStatus, 1000); // Update status after a moment
+                setTimeout(updateVmStatus, 1000); // Poll status after delay
             }
         });
 
-        // Simple alert function (replace with custom modal for production)
+        // --- Alert/Status Message Display ---
         function alertUser(message, type) {
             statusMessageDiv.textContent = message;
-            statusMessageDiv.className = `mt-6 p-3 rounded-md text-center text-sm ${
-                type === 'success' ? 'bg-green-700 text-white' :
-                type === 'error' ? 'bg-red-700 text-white' :
-                'bg-gray-700 text-gray-200'
-            }`;
-            // Revert message after a few seconds
+            statusMessageDiv.className = `mt-6 p-4 rounded-lg text-center font-semibold transition-colors duration-300`;
+            switch (type) {
+                case 'success': statusMessageDiv.classList.add('bg-green-800', 'text-green-100'); break;
+                case 'error': statusMessageDiv.classList.add('bg-red-800', 'text-red-100'); break;
+                case 'warning': statusMessageDiv.classList.add('bg-yellow-800', 'text-yellow-100'); break;
+                case 'info':
+                default: statusMessageDiv.classList.add('bg-gray-800', 'text-gray-300'); break;
+            }
+            // Reset status message after a few seconds
             setTimeout(() => {
-                statusMessageDiv.className = 'mt-6 p-3 rounded-md text-center text-sm bg-gray-700 text-gray-200';
-                statusMessageDiv.textContent = 'VM Status: ';
-                const statusSpan = document.createElement('span');
-                statusSpan.id = 'vmStatusText';
-                statusSpan.className = 'font-semibold';
-                statusMessageDiv.appendChild(statusSpan);
+                statusMessageDiv.className = 'mt-6 p-4 rounded-lg text-center font-semibold bg-gray-800 text-gray-300 transition-colors duration-300';
+                statusMessageDiv.innerHTML = 'VM Status: <span id="vmStatusText" class="font-bold">Checking...</span>';
+                vmStatusText = document.getElementById('vmStatusText'); // Re-get reference
                 updateVmStatus(); // Refresh actual status
             }, 5000);
         }
 
-        // Initial status check when page loads
-        updateVmStatus();
-        // Periodically update status
-        setInterval(updateVmStatus, 5000); // Update every 5 seconds
+        // --- Terminal Functions & Event Listeners ---
+        runCommandBtn.addEventListener('click', sendTerminalCommand);
+        terminalInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendTerminalCommand();
+            }
+        });
+
+        async function sendTerminalCommand() {
+            const command = terminalInput.value.trim();
+            if (!command) { addTerminalLog("Please enter a command.", 'info'); return; }
+
+            addTerminalLog(`> ${command}`, 'command'); // Echo command in terminal
+            terminalInput.value = ''; // Clear input
+
+            try {
+                const response = await fetch(`${SERVER_URL}/run_terminal_command`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ command: command })
+                });
+                const data = await response.json();
+                if (data.status === 'error') { addTerminalLog(`Server Error: ${data.message}`, 'error'); }
+            } catch (error) {
+                addTerminalLog(`Failed to send command: ${error.message || error}`, 'error');
+            }
+        }
+
+        async function getTerminalOutput() {
+            try {
+                const response = await fetch(`${SERVER_URL}/get_terminal_output`);
+                if (!response.ok) return; // Silently fail if server is down
+                const data = await response.json();
+                if (data.output && data.output.length > 0) {
+                    data.output.forEach(line => {
+                        addTerminalLog(line.message, line.type); // Directly use message and type from server
+                    });
+                }
+            } catch (error) {
+                // Console error already handled by initial fetch calls in updateVmStatus if server is truly down
+            }
+        }
+
+        function addTerminalLog(message, type = 'info') {
+            const span = document.createElement('span');
+            span.textContent = message;
+            span.classList.add(type);
+            terminalOutput.appendChild(span);
+            terminalOutput.appendChild(document.createElement('br'));
+            terminalOutput.scrollTop = terminalOutput.scrollHeight;
+        }
+
+        // --- Initial Load & Polling Setup ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log("DOM Content Loaded. Initializing Phoenix UI.");
+            
+            // Initial status and logs fetch after a short delay
+            setTimeout(async () => {
+                await updateVmStatus(); 
+                await getTerminalOutput(); 
+            }, 750); 
+
+            // Set up regular polling
+            setInterval(updateVmStatus, 5000); // Poll VM status every 5 seconds
+            setInterval(getTerminalOutput, 1500); // Poll terminal output every 1.5 seconds
+        });
     </script>
 </body>
 </html>
