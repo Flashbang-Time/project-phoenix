@@ -44,13 +44,11 @@ This project empowers you to boot, manage, and interact with a lightweight Windo
 
 1C. Import the web.py, index.html and os image using your file manager (just open the files with termux and import them into the default [downloads] folder)
 
-2C. MAKE SURE YOUR OS IMAGE IS CALLED os.qcow2 OTHERWISE THE VM WON'T BOOT
-
-3C. Execute these commands:
+2C. Execute these commands:
    cd downloads
-   pyhton web.py
+   python web.py
 
-4C. If everything went well, you should be able to access the web interface using 127.0.0.1:5000 on any browser
+3C. If everything went well, you should be able to access the web interface using 127.0.0.1:5000 on any browser
 
 💡 USING THE VM
 
@@ -60,55 +58,7 @@ This project empowers you to boot, manage, and interact with a lightweight Windo
 
 If you are on Windows, make sure to install the Drivers provided in the repo, here's how to:
 
-cd downloads (if not already in the downloads directory)
-
-rm web.py
-
-using any text editor of your choice open web.py from your file explorer and in the
-
-BASE_QEMU_COMMAND = (
-
-    "/data/data/com.termux/files/usr/bin/qemu-system-x86_64 "
-    
-    "-smp {cores} -m {ram_mb} "
-    
-    "-drive file=/data/data/com.termux/files/home/downloads/os.qcow2,if=ide,cache=writeback,aio=threads "
-    
-    "-netdev user,id=net0 -device virtio-net-pci,netdev=net0 "
-    
-    "-vga virtio -cpu {cpu_model} "
-    
-    "-vnc 0.0.0.0:0"
-)
-
-Add a line called "-cdrom virtio-win-0.1.271.iso"
-
-So it'll be like this
-
-BASE_QEMU_COMMAND = (
-
-    "/data/data/com.termux/files/usr/bin/qemu-system-x86_64 "
-    
-    "-smp {cores} -m {ram_mb} "
-    
-    "-drive file=/data/data/com.termux/files/home/downloads/os.qcow2,if=ide,cache=writeback,aio=threads "
-    
-    "-netdev user,id=net0 -device virtio-net-pci,netdev=net0 "
-    
-    "-vga virtio -cpu {cpu_model} "
-    
-    "-vnc 0.0.0.0:0"
-    
-    "-cdrom virtio-win-0.1.271.iso"    
-)
-
-After editing it reimport the file into termux using step 1C.
-
-Again, execute:
-
-cd downloads
-
-python web.py
+Go into the web interface, and put in the filename eg. virtio.iso
 
 After boot, go into device manager and install the drivers like any human being.
 
@@ -131,4 +81,4 @@ Doing so would allow unauthorized users to potentially execute arbitrary command
 Keep Project Phoenix strictly confined to your local network (e.g., Wi-Fi).
 
 💡 Future Visions
-Project Phoenix is continuously evolving! Ideas for future enhancements include: VNC password protection, QEMU snapshot management, advanced networking configurations, and improved UI/UX for a seamless experience.
+Project Phoenix is continuously evolving! Ideas for future enhancements include: VNC password protectionand QEMU snapshot management.
