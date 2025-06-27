@@ -1,5 +1,9 @@
 # Project Phoenix 🪖
 
+![alt text](https://cdn.discordapp.com/attachments/1047608068659224648/1388179605604663468/Your_paragraph_text.png?ex=68600a81&is=685eb901&hm=8877f93ee180aacabfd9064409ff7c596f79fc05e92cba72b0b6fac0e5cf09b3&)
+
+
+
 Experience Full Windows on the Go!
 Project Phoenix is an innovative and highly optimized web-based control panel designed to bring the power of a Windows Virtual Machine directly to your Android phone, leveraging the robust capabilities of Termux. Forget bulky laptops or complex command-line interfaces; Project Phoenix streamlines VM management into an intuitive, touch-friendly web interface, making high-performance mobile virtualization a reality.
 
