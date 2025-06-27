@@ -48,7 +48,9 @@ This project empowers you to boot, manage, and interact with a lightweight Windo
    cd downloads
    python web.py
 
-3C. If everything went well, you should be able to access the web interface using 127.0.0.1:5000 on any browser
+3C. In the Primary Disk Image Path (.qcow2) put in the image file name eg. win10.qcow2
+
+4C. If everything went well, you should be able to access the web interface using 127.0.0.1:5000 on any browser
 
 💡 USING THE VM
 
