@@ -19,42 +19,24 @@ This project empowers you to boot, manage, and interact with a lightweight Windo
 
 4A. termux
 
-5A. IMPORTANT check step 2C
 
-💡 HOW TO INSTALL
+💡 INSTALLING
+Import the script into termux (open the files with termux), and run these commands
 
-1B. Open Termux (downloaded from FDroid) 
-
-2B. Now execute the following commands
-
-3B. apt update, apt upgrade
-
-4B. apt install qemu-common
-
-5B. apt install qemu-system-x86-64-headless
-
-6B. apt install python (if not installed already)
-
-7B. pip install flask
-
-8B. pip install flask_cors
+cd downloads
+chmod +x install.sh
+./install.sh
 
 
-💡 FIRST SETUP
+💡 SETUP
 
-1C. Import the web.py, index.html and os image using your file manager (just open the files with termux and import them into the default [downloads] folder)
+1B. If everything went well, you should be able to access the web interface using 127.0.0.1:5000 on any browser
 
-2C. Execute these commands:
-   cd downloads
-   python web.py
-
-3C. In the Primary Disk Image Path (.qcow2) put in the image file name eg. win10.qcow2
-
-4C. If everything went well, you should be able to access the web interface using 127.0.0.1:5000 on any browser
+2B. In the Primary Disk Image Path (.qcow2) put in the image file name eg. win10.qcow2
 
 💡 USING THE VM
 
-1D. Using any VNC app, connect to 127.0.0.1:5900
+1C. Using any VNC app, connect to 127.0.0.1:5900
 
 💡 INSTALLING DRIVERS
 
