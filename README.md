@@ -21,10 +21,13 @@ This project empowers you to boot, manage, and interact with a lightweight Windo
 
 
 💡 INSTALLING
-Import the script into termux (open the files with termux), and run these commands
+
+Download the script from the release and import the script into termux (open the file with termux), and run these commands
 
 cd downloads
+
 chmod +x install.sh
+
 ./install.sh
 
 
