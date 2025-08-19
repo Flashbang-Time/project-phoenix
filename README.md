@@ -69,3 +69,5 @@ Keep Project Phoenix strictly confined to your local network (e.g., Wi-Fi).
 
 💡 Future Visions
 Project Phoenix is continuously evolving! Ideas for future enhancements include: VNC password protectionand QEMU snapshot management.
+
+To be added in version 3: In browser VNC, and better interface (19 aug, VNC implemented successfully into gui)
