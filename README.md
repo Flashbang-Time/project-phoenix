@@ -1,6 +1,6 @@
 
 
-![alt text](https://imgur.com/a/4EoEBfX)
+![alt text](https://cdn.discordapp.com/attachments/1047608068659224648/1407380771714371614/Your_paragraph_text_20250819_180544_0000.png?ex=68a5e4fb&is=68a4937b&hm=6c4e1de369943f70a156e3d27bfae412208c3f76d364a3f27b7d8c982daf540f&)
 
 
 
