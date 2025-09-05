@@ -4,92 +4,70 @@
 
 
 
-🚀 Project Phoenix – Windows VM on Android (via Termux)
+Project Phoenix – Windows VM on Android (via Termux)
+===================================================
 
 Experience full Windows on the go!
-Project Phoenix transforms your Android device into a control center + QEMU VM host, complete with a touch-friendly web interface.
+Project Phoenix transforms your Android device into a control center and QEMU VM host, complete with a web interface.
+Run lightweight Windows builds, legacy apps, or just enjoy a desktop environment — all from your phone.
 
-⚡ Run lightweight Windows builds, legacy apps, or just enjoy a desktop environment — all from your phone.
-
-⚠️ Critical Security Note
-
-👉 Do NOT expose this server to the internet.
+---------------------------------------------------
+CRITICAL SECURITY NOTE
+---------------------------------------------------
+Do NOT expose this server to the internet.
 There is no authentication. If you port-forward this, you’re basically giving strangers root access to your phone.
 Keep it local only (Wi-Fi/localhost).
 
-🛠️ Prerequisites
+---------------------------------------------------
+Prerequisites
+---------------------------------------------------
+- A brain (preferably switched on)
+- An Android device
+- Termux installed
+- Some patience (performance depends on your phone — TCG is slow)
 
-🧠 A brain (preferably switched on)
-
-📱 An Android device
-
-📦 Termux installed
-
-⚡ Some patience (performance depends on your phone — TCG is slooow)
-
-📥 Installation
-
-Download the latest release from GitHub (look in the Releases
- tab).
-
-Open the .sh script in Termux.
-
-Run the following commands:
+---------------------------------------------------
+Installation
+---------------------------------------------------
+1. Download the latest release from GitHub (check the Releases tab).
+2. Open the .sh script in Termux.
+3. Run the following commands:
 
 cd ~/downloads
 chmod +x install.sh
 ./install.sh
 
-⚙️ Setup
+---------------------------------------------------
+Setup
+---------------------------------------------------
+1. If everything went well, access the web interface at: 127.0.0.1:5000
+2. In "Primary Disk Image Path (.qcow2)" enter your image filename (example: win10.qcow2)
 
-Once installed, open your browser and go to:
-http://127.0.0.1:5000
+---------------------------------------------------
+Using the VM
+---------------------------------------------------
+1. Use any VNC client to connect to 127.0.0.1:5900
+2. Default display is always :0 (port 5900)
 
-In the web interface, enter your primary disk image filename, e.g.:
+---------------------------------------------------
+Installing Drivers
+---------------------------------------------------
+1. Download virtio.iso from the repo
+2. Add the ISO path in the web interface
+3. Boot the VM, open Device Manager in Windows, and install the drivers manually
 
-win10.qcow2
+---------------------------------------------------
+Known Issues / Limitations
+---------------------------------------------------
+- Performance will never match native hardware (TCG is software emulation)
+- Expect heating and battery drain (use while charging if possible)
+- No authentication/security built in
+- Sound is broken
+- No snapshot support
 
-
-(Place this file inside the Project Phoenix directory so QEMU can find it.)
-
-🖥️ Using the VM
-
-You’ve got two options:
-
-Built-in browser VNC viewer (runs inside the web UI)
-
-External VNC client: connect to 127.0.0.1:5900
-
-📀 Installing Drivers (Windows Guests)
-
-Add the virtio.iso driver image through the web interface.
-
-Boot Windows, open Device Manager, and manually install drivers for each unknown device.
-
-Storage
-
-Network
-
-Display (basic virtio GPU)
-
-Don’t panic if Windows complains. Just keep clicking next like a “human being.”
-
-⚠️ Known Issues / Limitations
-
-🔇 Sound is broken (might be unfixable, TCG doesn’t like us)
-
-🔑 No VNC password yet (planned, maybe)
-
-💤 No snapshot support (not my problem)
-
-🔥 Performance + heat: x86 on ARM = TCG hell. Expect lag + hot phone.
-
-🔮 Future Visions
-
-VNC authentication
-
-Snapshot management
-
-Better networking options
-
-Maybe fixing audio (pls help)
+---------------------------------------------------
+Future Visions
+---------------------------------------------------
+- VNC password protection
+- QEMU snapshot management
+- Further UI optimizations
