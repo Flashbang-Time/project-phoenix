@@ -4,70 +4,96 @@
 
 
 
-Project Phoenix – Windows VM on Android (via Termux)
-===================================================
+# 🚀 Project Phoenix – Windows VM on Android (via Termux)
 
-Experience full Windows on the go!
-Project Phoenix transforms your Android device into a control center and QEMU VM host, complete with a web interface.
-Run lightweight Windows builds, legacy apps, or just enjoy a desktop environment — all from your phone.
+**Experience full Windows on the go!**  
+Project Phoenix transforms your Android device into a control center + QEMU VM host, complete with a touch-friendly web interface.
 
----------------------------------------------------
-CRITICAL SECURITY NOTE
----------------------------------------------------
-Do NOT expose this server to the internet.
-There is no authentication. If you port-forward this, you’re basically giving strangers root access to your phone.
-Keep it local only (Wi-Fi/localhost).
+⚡ Run lightweight Windows builds, legacy apps, or just enjoy a desktop environment — all from your phone.
 
----------------------------------------------------
-Prerequisites
----------------------------------------------------
-- A brain (preferably switched on)
-- An Android device
-- Termux installed
-- Some patience (performance depends on your phone — TCG is slow)
+---
 
----------------------------------------------------
-Installation
----------------------------------------------------
-1. Download the latest release from GitHub (check the Releases tab).
-2. Open the .sh script in Termux.
-3. Run the following commands:
+## ⚠️ Critical Security Note
 
+👉 **Do NOT expose this server to the internet.**  
+There is no authentication. If you port-forward this, you’re basically giving strangers root access to your phone.  
+**Keep it local only (Wi-Fi/localhost).**
+
+---
+
+## 🛠️ Prerequisites
+
+- 🧠 A brain (preferably switched on)  
+- 📱 An Android device  
+- 📦 Termux installed  
+- ⚡ Some patience (performance depends on your phone — TCG is slooow)  
+
+---
+
+## 📥 Installation
+
+Download the latest release from GitHub (look in the **Releases** tab).  
+
+Open the `.sh` script in Termux.  
+
+Run the following commands:
+
+```bash
 cd ~/downloads
 chmod +x install.sh
 ./install.sh
+```
 
----------------------------------------------------
-Setup
----------------------------------------------------
-1. If everything went well, access the web interface at: 127.0.0.1:5000
-2. In "Primary Disk Image Path (.qcow2)" enter your image filename (example: win10.qcow2)
+---
 
----------------------------------------------------
-Using the VM
----------------------------------------------------
-1. Use any VNC client to connect to 127.0.0.1:5900
-2. Default display is always :0 (port 5900)
+## ⚙️ Setup
 
----------------------------------------------------
-Installing Drivers
----------------------------------------------------
-1. Download virtio.iso from the repo
-2. Add the ISO path in the web interface
-3. Boot the VM, open Device Manager in Windows, and install the drivers manually
+Once installed, open your browser and go to:  
+**http://127.0.0.1:5000**
 
----------------------------------------------------
-Known Issues / Limitations
----------------------------------------------------
-- Performance will never match native hardware (TCG is software emulation)
-- Expect heating and battery drain (use while charging if possible)
-- No authentication/security built in
-- Sound is broken
-- No snapshot support
+In the web interface, enter your primary disk image filename, e.g.:  
 
----------------------------------------------------
-Future Visions
----------------------------------------------------
-- VNC password protection
-- QEMU snapshot management
-- Further UI optimizations
+```
+win10.qcow2
+```
+
+(Place this file inside the Project Phoenix directory so QEMU can find it.)
+
+---
+
+## 🖥️ Using the VM
+
+You’ve got two options:
+
+1. **Built-in browser VNC viewer** (runs inside the web UI)  
+2. **External VNC client** → connect to `127.0.0.1:5900`
+
+---
+
+## 📀 Installing Drivers (Windows Guests)
+
+1. Add the **virtio.iso** driver image through the web interface.  
+2. Boot Windows, open **Device Manager**, and manually install drivers for each unknown device:
+   - Storage  
+   - Network  
+   - Display (basic virtio GPU)  
+
+👉 Don’t panic if Windows complains. Just keep clicking **Next** like a “human being.”
+
+---
+
+## ⚠️ Known Issues / Limitations
+
+- 🔇 **Sound is broken** (might be unfixable, TCG doesn’t like us)  
+- 🔑 **No VNC password** yet (planned, maybe)  
+- 💤 **No snapshot support** (not my problem)  
+- 🔥 **Performance + heat:** x86 on ARM = TCG hell. Expect lag + hot phone.  
+
+---
+
+## 🔮 Future Visions
+
+- VNC authentication  
+- Snapshot management  
+- Better networking options  
+- Maybe fixing audio (**pls help**)  
