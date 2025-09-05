@@ -4,69 +4,92 @@
 
 
 
-Experience Full Windows on the Go!
-Project Phoenix is an innovative and highly optimized web-based control panel designed to bring the power of a Windows Virtual Machine directly to your Android phone, leveraging the robust capabilities of Termux. Forget bulky laptops or complex command-line interfaces; Project Phoenix streamlines VM management into an intuitive, touch-friendly web interface, making high-performance mobile virtualization a reality.
+🚀 Project Phoenix – Windows VM on Android (via Termux)
 
-This project empowers you to boot, manage, and interact with a lightweight Windows operating system, perfect for specialized software, legacy applications, or simply enjoying a desktop environment on your mobile device. With built-in audio support and essential setup tools, Project Phoenix offers a comprehensive solution for mobile computing enthusiasts and power users.
+Experience full Windows on the go!
+Project Phoenix transforms your Android device into a control center + QEMU VM host, complete with a touch-friendly web interface.
 
-⚠️ PREREQUISITES
+⚡ Run lightweight Windows builds, legacy apps, or just enjoy a desktop environment — all from your phone.
 
-1A. some mental capacity
+⚠️ Critical Security Note
 
-2A. a brain
+👉 Do NOT expose this server to the internet.
+There is no authentication. If you port-forward this, you’re basically giving strangers root access to your phone.
+Keep it local only (Wi-Fi/localhost).
 
-3A. an android phone
+🛠️ Prerequisites
 
-4A. termux
+🧠 A brain (preferably switched on)
 
+📱 An Android device
 
-💡 INSTALLING
+📦 Termux installed
 
-Download the script from the latest release and import the script into termux (open the file with termux), and run these commands
+⚡ Some patience (performance depends on your phone — TCG is slooow)
 
-cd downloads
+📥 Installation
 
+Download the latest release from GitHub (look in the Releases
+ tab).
+
+Open the .sh script in Termux.
+
+Run the following commands:
+
+cd ~/downloads
 chmod +x install.sh
-
 ./install.sh
 
+⚙️ Setup
 
-💡 SETUP
+Once installed, open your browser and go to:
+http://127.0.0.1:5000
 
-1B. If everything went well, you should be able to access the web interface using 127.0.0.1:5000 on any browser
+In the web interface, enter your primary disk image filename, e.g.:
 
-2B. In the Primary Disk Image Path (.qcow2) put in the image file name eg. win10.qcow2
-
-💡 USING THE VM
-
-1C. Using any VNC app, connect to 127.0.0.1:5900
-
-💡 INSTALLING DRIVERS
-
-If you are on Windows, make sure to install the Drivers provided in the repo, here's how to:
-
-Go into the web interface, and put in the filename eg. virtio.iso
-
-After boot, go into device manager and install the drivers like any human being.
+win10.qcow2
 
 
-⚠️ Important Disclaimers & Security Information
-Performance: Expect performance limitations. QEMU on ARM uses software emulation (TCG) for x86 instructions, which is inherently slower than native hardware virtualization. While optimized, it won't match a dedicated PC.
+(Place this file inside the Project Phoenix directory so QEMU can find it.)
 
-Heat & Battery: High CPU load will cause significant device heating and rapid battery drain. Use in a well-ventilated area or while charging.
+🖥️ Using the VM
 
-VM Optimization is KEY: The responsiveness of your VM is highly dependent on the Windows image itself. Use "Lite" versions, disable unnecessary services, and optimize settings within Windows.
+You’ve got two options:
 
-Security (CRITICAL!):
+Built-in browser VNC viewer (runs inside the web UI)
 
-This server lacks authentication and robust security measures.
+External VNC client: connect to 127.0.0.1:5900
 
-NEVER expose this server to the public internet via port forwarding or similar methods.
+📀 Installing Drivers (Windows Guests)
 
-Doing so would allow unauthorized users to potentially execute arbitrary commands on your phone, install malicious software, or perform denial-of-service attacks.
+Add the virtio.iso driver image through the web interface.
 
-Keep Project Phoenix strictly confined to your local network (e.g., Wi-Fi).
+Boot Windows, open Device Manager, and manually install drivers for each unknown device.
 
-💡 Future Visions
-Project Phoenix is continuously evolving! Ideas for future enhancements include: VNC password protectionand QEMU snapshot management.
+Storage
 
+Network
+
+Display (basic virtio GPU)
+
+Don’t panic if Windows complains. Just keep clicking next like a “human being.”
+
+⚠️ Known Issues / Limitations
+
+🔇 Sound is broken (might be unfixable, TCG doesn’t like us)
+
+🔑 No VNC password yet (planned, maybe)
+
+💤 No snapshot support (not my problem)
+
+🔥 Performance + heat: x86 on ARM = TCG hell. Expect lag + hot phone.
+
+🔮 Future Visions
+
+VNC authentication
+
+Snapshot management
+
+Better networking options
+
+Maybe fixing audio (pls help)
