@@ -1,4 +1,4 @@
-# web.py - Project Phoenix Enhanced QEMU Control Server
+# web.py - Project Phoenix Advanced QEMU Control Server
 
 import os
 import subprocess
@@ -9,6 +9,7 @@ import time
 import queue
 import re
 import sys
+import psutil
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -35,6 +36,7 @@ DEFAULT_WEBSOCK_IP_2 = "127.0.0.1:5900"
 
 BASE_QEMU_COMMAND_TEMPLATE = (
     "qemu-system-x86_64 "
+    "-accel tcg,thread=multi,tb-size=1024 "
     "-smp {cores} -m {ram_mb} "
     "-cpu {cpu_model} "
     "-boot order={boot_order} "
@@ -55,7 +57,7 @@ print("QEMU_DEPENDS config valid!")
 
 print("                     ")
 #print("                     ")
-#print("                     ")
+#print
 
 
 # --- END QEMU CONFIGURATION ---
@@ -176,15 +178,20 @@ def serve_terminal():
     except FileNotFoundError:
         return "Error: terminal.html not found in directory"
 
- 
 
+# --- Fututi icoana si dumnezeul tau mergi fututen gura ---
 @app.route('/start_vm', methods=['POST'])
 def start_vm():
+    """Handles requests to start the QEMU VM with dynamic parameters."""
     global QEMU_PROCESS, QEMU_RUNNING_STATUS
+
     if QEMU_PROCESS is not None:
+        print("DEBUG(API): VM is already running, ignoring start request.")
         return jsonify({"status": "info", "message": "VM is already running."}), 200
 
     data = request.get_json()
+
+    # --- Extract and Validate Parameters ---
     try:
         ram_mb = int(data.get('ram_mb', DEFAULT_RAM_MB))
         cores = int(data.get('cores', DEFAULT_CORES))
@@ -192,67 +199,133 @@ def start_vm():
         boot_order = str(data.get('boot_order', DEFAULT_BOOT_ORDER))
         vga_model = str(data.get('vga_model', DEFAULT_VGA_MODEL))
         net_device = str(data.get('net_device', DEFAULT_NET_DEVICE))
-     
+        
         primary_disk_path = str(data.get('primary_disk_path', DEFAULT_PRIMARY_DISK_PATH)).strip()
         cdrom_path = str(data.get('cdrom_path', DEFAULT_CDROM_PATH)).strip()
         data_disk_path = str(data.get('data_disk_path', DEFAULT_DATA_DISK_PATH)).strip()
+
     except (ValueError, TypeError) as e:
-        return jsonify({"status": "error", "message": f"Invalid input for VM parameters: {e}."}), 400
+        error_msg = f"Invalid input for VM parameters: {e}. Please provide valid values."
+        print(f"ERROR(API): {error_msg}")
+        return jsonify({"status": "error", "message": error_msg}), 400
 
+    # Basic input validation
     if not (512 <= ram_mb <= 32768):
-        return jsonify({"status": "error", "message": "RAM must be between 512 MB and 32768 MB."}), 400
+        error_msg = "RAM must be between 512 MB and 32768 MB."
+        print(f"ERROR(API): {error_msg}")
+        return jsonify({"status": "error", "message": error_msg}), 400
     if not (1 <= cores <= 12):
-        return jsonify({"status": "error", "message": "Cores must be between 1 and 12."}), 400
-    if not primary_disk_path or not os.path.exists(primary_disk_path):
-        return jsonify({"status": "error", "message": f"Primary Disk image not found at: {primary_disk_path}"}), 400
-    if cdrom_path and not os.path.exists(cdrom_path):
-        return jsonify({"status": "error", "message": f"CD-ROM ISO image not found at: {cdrom_path}"}), 400
-    if data_disk_path and not os.path.exists(data_disk_path):
-        return jsonify({"status": "error", "message": f"Data Disk image not found at: {data_disk_path}"}), 400
+        error_msg = "Cores must be between 1 and 12."
+        print(f"ERROR(API): {error_msg}")
+        return jsonify({"status": "error", "message": error_msg}), 400
+    if not re.fullmatch(r'[a-zA-Z0-9_-]+', cpu_model):
+        error_msg = "Invalid CPU model. Only alphanumeric, hyphens, and underscores allowed."
+        print(f"ERROR(API): {error_msg}")
+        return jsonify({"status": "error", "message": error_msg}), 400
+    if boot_order not in ['c', 'd', 'n', 'cd', 'dc', 'ncd', 'dnc']: # Expand as needed
+        error_msg = "Invalid boot order. Use 'c' for disk, 'd' for CD-ROM, 'n' for network."
+        print(f"ERROR(API): {error_msg}")
+        return jsonify({"status": "error", "message": error_msg}), 400
+    if vga_model not in ['std', 'qxl', 'virtio', 'vmware', 'cirrus']:
+        error_msg = "Invalid VGA model."
+        print(f"ERROR(API): {error_msg}")
+        return jsonify({"status": "error", "message": error_msg}), 400
+    if net_device not in ['virtio-net-pci', 'e1000', 'rtl8139']:
+        error_msg = "Invalid Network device model."
+        print(f"ERROR(API): {error_msg}")
+        return jsonify({"status": "error", "message": error_msg}), 400
 
+    if not primary_disk_path:
+        error_msg = "Primary Disk Path cannot be empty."
+        print(f"ERROR(API): {error_msg}")
+        return jsonify({"status": "error", "message": error_msg}), 400
+    if not os.path.exists(primary_disk_path):
+        error_msg = f"Primary Disk image not found at: {primary_disk_path}"
+        print(f"ERROR(API): {error_msg}")
+        return jsonify({"status": "error", "message": error_msg}), 400
+    if cdrom_path and not os.path.exists(cdrom_path):
+        error_msg = f"CD-ROM ISO image not found at: {cdrom_path}"
+        print(f"ERROR(API): {error_msg}")
+        return jsonify({"status": "error", "message": error_msg}), 400
+    if data_disk_path and not os.path.exists(data_disk_path):
+        error_msg = f"Data Disk image not found at: {data_disk_path}"
+        print(f"ERROR(API): {error_msg}")
+        return jsonify({"status": "error", "message": error_msg}), 400
+
+    # --- Construct the QEMU Command ---
     qemu_command_parts = [
         BASE_QEMU_COMMAND_TEMPLATE.format(
-            ram_mb=ram_mb, cores=cores, cpu_model=cpu_model, boot_order=boot_order,
-            vga_model=vga_model, net_device=net_device
+            ram_mb=ram_mb,
+            cores=cores,
+            cpu_model=cpu_model,
+            boot_order=boot_order,
+            vga_model=vga_model,
+            net_device=net_device
         )
     ]
-    qemu_command_parts.append(f"-drive file={primary_disk_path},if=virtio,cache=writeback,aio=threads,format=qcow2")
+
+    # Add primary disk
+    qemu_command_parts.append(
+        f"-drive file={primary_disk_path},if=virtio,cache=writeback,aio=threads,format=qcow2"
+    )
+    # Add CD-ROM if specified
     if cdrom_path:
-        qemu_command_parts.append(f"-cdrom={cdrom_path}")
+        qemu_command_parts.append(
+            f"-cdrom={cdrom_path}" # Use ide for CD-ROM usually
+        )
+    # Add secondary data disk if specified
     if data_disk_path:
-        qemu_command_parts.append(f"-drive media={data_disk_path},if=virtio,cache=writeback,aio=threads,format=qcow2")
+        qemu_command_parts.append(
+            f"-drive media={data_disk_path},if=virtio,cache=writeback,aio=threads,format=qcow2"
+        )
+    # Add USB passthrough devices (if configured)
+    # This assumes DEFAULT_USB_DEVICES is a list of (vendor_id, product_id)
+    # Example: DEFAULT_USB_DEVICES = [("0x1234", "0xABCD")]
     for vendor_id, product_id in DEFAULT_USB_DEVICES:
         qemu_command_parts.append(f"-device usb-host,vendorid={vendor_id},productid={product_id}")
 
+
     dynamic_qemu_command = " ".join(qemu_command_parts)
+
+    print(f"DEBUG(API): Received request to START VM with config: RAM={ram_mb}MB, Cores={cores}, CPU={cpu_model}, Primary Disk={primary_disk_path}, CD-ROM={cdrom_path}, Data Disk={data_disk_path}, Boot Order={boot_order}, VGA={vga_model}, Net={net_device}")
     print(f"DEBUG(API): Full QEMU command: {dynamic_qemu_command}")
 
+    # Clear any previous QEMU logs before starting a new session
     while not QEMU_OUTPUT_QUEUE.empty(): QEMU_OUTPUT_QUEUE.get_nowait()
+
+    # Start QEMU in a separate thread to keep the Flask app responsive
     threading.Thread(target=run_qemu_in_thread, args=(dynamic_qemu_command,)).start()
-    time.sleep(3)
+
+    time.sleep(3) # Give QEMU a moment to attempt starting
+
+    # Check QEMU_RUNNING_STATUS to see if it successfully started
     if QEMU_RUNNING_STATUS:
         message = "VM started successfully. Connect your VNC client to 127.0.0.1:5900 (display 0)."
         status = "success"
+        print(f"DEBUG(API): {message}")
     else:
-        message = "VM failed to start or encountered an error. Check logs for details."
+        message = "VM failed to start or encountered an error. Check Termux console or /qemu_logs for details."
         status = "error"
+        print(f"DEBUG(API): {message}")
+
     return jsonify({"status": status, "message": message}), 200
 
 
+    @app.route('/stop_vm', methods=['POST'])
+    def stop_vm():
+        global QEMU_PROCESS, QEMU_RUNNING_STATUS
+        if QEMU_PROCESS:
+            try:
+                QEMU_PROCESS.kill()
+                QEMU_PROCESS = None
+                QEMU_RUNNING_STATUS = False
+                return jsonify({"status": "success", "message": "VM stopped successfully."}), 200
+            except Exception as e:
+                return jsonify({"status": "error", "message": f"Failed to stop VM: {e}"}), 500
+        else:
+            return jsonify({"status": "info", "message": "VM is not running."}), 200
 
-@app.route('/stop_vm', methods=['POST'])
-def stop_vm():
-    global QEMU_PROCESS, QEMU_RUNNING_STATUS
-    if QEMU_PROCESS:
-        try:
-            QEMU_PROCESS.kill()
-            QEMU_PROCESS = None
-            QEMU_RUNNING_STATUS = False
-            return jsonify({"status": "success", "message": "VM stopped successfully."}), 200
-        except Exception as e:
-            return jsonify({"status": "error", "message": f"Failed to stop VM: {e}"}), 500
-    else:
-        return jsonify({"status": "info", "message": "VM is not running."}), 200
+
 
 @app.route('/vm_status', methods=['GET'])
 def vm_status():
@@ -311,6 +384,8 @@ def get_terminal_output():
         except queue.Empty:
             break
     return jsonify({"output": output_lines}), 200
+
+
 
 if __name__ == '__main__':
     static_folder_path = os.path.join(basedir, 'static')
