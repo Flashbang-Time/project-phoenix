@@ -1,137 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Phoenix: QEMU Control</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .log-box {
-            background-color: #0f172a;
-            border: 1px solid #1e293b;
-            border-radius: 0.5rem;
-            padding: 1rem;
-            height: 250px;
-            overflow-y: auto;
-            font-family: monospace;
-            font-size: 0.875rem;
-            color: #cbd5e1;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-        .log-box span.error { color: #f87171; }
-        .log-box span.success { color: #4ade80; }
-        .log-box span.info { color: #60a5fa; }
-        .log-box span.command { color: #f3f4f6; font-weight: bold; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Phoenix: QEMU Control</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .log-box {
+      background-color: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      height: 250px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 0.875rem;
+      color: #cbd5e1;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .log-box span.error { color: #f87171; }
+    .log-box span.success { color: #4ade80; }
+    .log-box span.info { color: #60a5fa; }
+    .log-box span.command { color: #f3f4f6; font-weight: bold; }
+  </style>
 </head>
 <body class="bg-gray-900 text-gray-100 flex">
 
-    <!-- Sidebar -->
-    <aside class="w-64 bg-gray-800 h-screen fixed left-0 top-0 flex flex-col">
-        <div class="p-6 border-b border-gray-700">
-            <h1 class="text-xl font-bold text-white">Project Phoenix</h1>
-            <p class="text-xs text-gray-400">QEMU Control Panel</p>
-        </div>
-        <nav class="flex-1 p-4">
-            <ul class="space-y-2">
-                <li><a href="http://127.0.0.1:5000" class="block px-3 py-2 rounded hover:bg-gray-700">VM Settings</a></li>
-                <li><a href="http://127.0.0.1:5000/vncgui" class="block px-3 py-2 rounded hover:bg-gray-700">VNC</a></li>
-                <li><a href="http://127.0.0.1:5000/terminal" class="block px-3 py-2 rounded hover:bg-gray-700">Terminal</a></li>
-            </ul>
-        </nav>
-        <div class="p-4 border-t border-gray-700 text-xs text-gray-400">
-            © 2025 Project Phoenix
-        </div>
-    </aside>
-
-    <!-- Main Content -->
-    <div class="ml-64 flex-1 flex flex-col min-h-screen">
-
-        <!-- Top Navbar -->
-        <header class="bg-gray-800 border-b border-gray-700 p-4 flex justify-between items-center">
-            <h2 class="text-lg font-semibold">VM Settings</h2>
-            <div id="statusMessage" class="text-sm text-gray-300">
-                VM Status: <span id="vmStatusText" class="font-bold">Checking...</span>
-            </div>
-        </header>
-
-        <!-- Content Area -->
-        <main class="p-6 space-y-6">
-
-            <!-- Core Settings Card -->
-            <div class="bg-gray-800 rounded-lg shadow p-6">
-             
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <label for="ramInput" class="block text-sm text-gray-300 mb-2">RAM (MB)</label>
-                        <input type="number" id="ramInput" class="w-full rounded bg-gray-700 border border-gray-600 text-white p-2" value="8192" min="512" max="32768">
-                    </div>
-                    <div>
-                        <label for="coresInput" class="block text-sm text-gray-300 mb-2">CPU Cores</label>
-                        <input type="number" id="coresInput" class="w-full rounded bg-gray-700 border border-gray-600 text-white p-2" value="6" min="1" max="12">
-                    </div>
-                    <div>
-                        <label for="cpuModelSelect" class="block text-sm text-gray-300 mb-2">CPU Model</label>
-                        <select id="cpuModelSelect" class="w-full rounded bg-gray-700 border border-gray-600 text-white p-2"></select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Storage Settings -->
-            <div class="bg-gray-800 rounded-lg shadow p-6">
-                <h3 class="text-xl font-semibold mb-4 border-b border-gray-700 pb-2">Storage</h3>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm mb-2 text-gray-300">Primary Disk Image Path (.qcow2)</label>
-                        <input type="text" id="primaryDiskPathInput" class="w-full rounded bg-gray-700 border border-gray-600 text-white p-2" placeholder="Windows_100G.qcow2">
-                    </div>
-                    <div>
-                        <label class="block text-sm mb-2 text-gray-300">CD-ROM / ISO Path</label>
-                        <input type="text" id="cdromPathInput" class="w-full rounded bg-gray-700 border border-gray-600 text-white p-2" placeholder="win10.iso">
-                    </div>
-                    <div>
-                        <label class="block text-sm mb-2 text-gray-300">Secondary Data Disk (.qcow2)</label>
-                        <input type="text" id="dataDiskPathInput" class="w-full rounded bg-gray-700 border border-gray-600 text-white p-2" placeholder="data.qcow2">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Network & Display -->
-            <div class="bg-gray-800 rounded-lg shadow p-6">
-                <h3 class="text-xl font-semibold mb-4 border-b border-gray-700 pb-2">Network & Display</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-sm text-gray-300 mb-2">Network Device Model</label>
-                        <select id="netDeviceSelect" class="w-full rounded bg-gray-700 border border-gray-600 text-white p-2"></select>
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-300 mb-2">VGA Display Model</label>
-                        <select id="vgaModelSelect" class="w-full rounded bg-gray-700 border border-gray-600 text-white p-2"></select>
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-300 mb-2">Boot Order</label>
-                        <select id="bootOrderSelect" class="w-full rounded bg-gray-700 border border-gray-600 text-white p-2"></select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Controls -->
-            <div class="flex gap-4">
-                <button id="startButton" class="flex-1 bg-green-600 hover:bg-green-700 py-3 rounded text-white font-bold">Start VM</button>
-                <button id="stopButton" class="flex-1 bg-red-600 hover:bg-red-700 py-3 rounded text-white font-bold" disabled>Stop VM</button>
-            </div>
-
-
-
-       
-
-        </main>
+<!-- Sidebar -->
+<aside id="sidebar"
+  class="w-64 bg-gray-800 h-screen fixed left-0 top-0 flex-col transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-40 hidden md:flex">
+  <div class="p-6 border-b border-gray-700 flex justify-between items-center">
+    <div>
+      <h1 class="text-xl font-bold text-white">Project Phoenix</h1>
+      <p class="text-xs text-gray-400">QEMU Control Panel</p>
     </div>
+    <!-- Close button (mobile only) -->
+    <button id="closeSidebarBtn" class="md:hidden p-2 rounded bg-gray-700 hover:bg-gray-600">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none"
+        viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+  <nav class="flex-1 p-4">
+    <ul class="space-y-2">
+      <li><a href="/" class="block px-3 py-2 rounded hover:bg-gray-700">VM Settings</a></li>
+      <li><a href="/vncgui" class="block px-3 py-2 rounded hover:bg-gray-700">VNC</a></li>
+      <li><a href="/terminal" class="block px-3 py-2 rounded hover:bg-gray-700">Terminal</a></li>
+    </ul>
+  </nav>
+  <div class="p-4 border-t border-blue-700 text-xs text-blue-400">
+    © 2025 Project Phoenix
+  </div>
+</aside>
+
+  <!-- Main Content -->
+  <div class="md:ml-64 flex-1 flex flex-col min-h-screen">
+
+    <!-- Top Navbar -->
+    <header class="bg-gray-800 border-b border-gray-700 p-4 flex justify-between items-center">
+      <div class="flex items-center gap-2">
+        <!-- Mobile menu button -->
+        <button id="menuBtn" class="md:hidden p-2 rounded bg-gray-700 hover:bg-gray-600">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <h2 class="text-lg font-semibold">VM Settings</h2>
+      </div>
+      <div id="statusMessage" class="text-sm text-gray-300">
+        VM Status: <span id="vmStatusText" class="font-bold">Checking...</span>
+      </div>
+    </header>
+
+    <!-- Content Area -->
+    <main class="p-4 md:p-6 space-y-6">
+
+      <!-- Core Settings Card -->
+      <div class="bg-gray-800 rounded-lg shadow p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <label for="ramInput" class="block text-sm text-gray-300 mb-2">RAM (MB)</label>
+            <input type="number" id="ramInput"
+              class="w-full rounded bg-gray-700 border border-gray-600 text-white p-2"
+              value="8192" min="512" max="32768">
+          </div>
+          <div>
+            <label for="coresInput" class="block text-sm text-gray-300 mb-2">CPU Cores</label>
+            <input type="number" id="coresInput"
+              class="w-full rounded bg-gray-700 border border-gray-600 text-white p-2"
+              value="6" min="1" max="12">
+          </div>
+          <div>
+            <label for="cpuModelSelect" class="block text-sm text-gray-300 mb-2">CPU Model</label>
+            <select id="cpuModelSelect"
+              class="w-full rounded bg-gray-700 border border-gray-600 text-white p-2"></select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Storage Settings -->
+      <div class="bg-gray-800 rounded-lg shadow p-6">
+        <h3 class="text-xl font-semibold mb-4 border-b border-gray-700 pb-2">Storage</h3>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm mb-2 text-gray-300">Primary Disk Image Path (.qcow2)</label>
+            <input type="text" id="primaryDiskPathInput"
+              class="w-full rounded bg-gray-700 border border-gray-600 text-white p-2"
+              placeholder="Windows_100G.qcow2">
+          </div>
+          <div>
+            <label class="block text-sm mb-2 text-gray-300">CD-ROM / ISO Path</label>
+            <input type="text" id="cdromPathInput"
+              class="w-full rounded bg-gray-700 border border-gray-600 text-white p-2"
+              placeholder="win10.iso">
+          </div>
+          <div>
+            <label class="block text-sm mb-2 text-gray-300">Secondary Data Disk (.qcow2)</label>
+            <input type="text" id="dataDiskPathInput"
+              class="w-full rounded bg-gray-700 border border-gray-600 text-white p-2"
+              placeholder="data.qcow2">
+          </div>
+        </div>
+      </div>
+
+      <!-- Network & Display -->
+      <div class="bg-gray-800 rounded-lg shadow p-6">
+        <h3 class="text-xl font-semibold mb-4 border-b border-gray-700 pb-2">Network & Display</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm text-gray-300 mb-2">Network Device Model</label>
+            <select id="netDeviceSelect"
+              class="w-full rounded bg-gray-700 border border-gray-600 text-white p-2"></select>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-300 mb-2">VGA Display Model</label>
+            <select id="vgaModelSelect"
+              class="w-full rounded bg-gray-700 border border-gray-600 text-white p-2"></select>
+          </div>
+          <div>
+            <label class="block text-sm text-gray-300 mb-2">Boot Order</label>
+            <select id="bootOrderSelect"
+              class="w-full rounded bg-gray-700 border border-gray-600 text-white p-2"></select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="flex flex-col md:flex-row gap-4">
+        <button id="startButton"
+          class="flex-1 bg-green-600 hover:bg-green-700 py-3 rounded text-white font-bold">Start
+          VM</button>
+        <button id="stopButton"
+          class="flex-1 bg-red-600 hover:bg-red-700 py-3 rounded text-white font-bold"
+          disabled>Stop VM</button>
+      </div>
+
+    </main>
+  </div>
+
+    <!-- JS for Sidebar Toggle -->
+    <script>
+      const menuBtn = document.getElementById("menuBtn");
+      const sidebar = document.getElementById("sidebar");
+
+
+      menuBtn.addEventListener("click", () => {
+        sidebar.classList.toggle("hidden");
+        sidebar.classList.toggle("-translate-x-full");
+      });
+    </script>
+
+  <!-- Keep your big VM JS logic script here (unchanged) -->
+</body>
+</html>
+
 
     <!-- Main JavaScript Logic -->
     <script>
@@ -219,7 +268,10 @@
                     vmStatusText.classList.add('text-red-400');
                     startButton.disabled = false;
                     stopButton.disabled = true;
-                }
+                }  
+            
+
+
             } catch (error) {
                 console.error('Error fetching VM status (server potentially down):', error);
                 vmStatusText.textContent = 'Error (Server Down?)';
@@ -287,6 +339,8 @@
             }
         });
 
+
+
         // --- Alert/Status Message Display ---
         function alertUser(message, type) {
             statusMessageDiv.textContent = message;
@@ -323,5 +377,41 @@
             setInterval(getTerminalOutput, 1500); // Poll terminal output every 1.5 seconds
         });
     </script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const menuBtn = document.getElementById('menuBtn');
+      const sidebar = document.getElementById('sidebar');
+      const closeBtn = document.getElementById('closeSidebarBtn');
+    
+      function openSidebar() {
+        sidebar.classList.remove('hidden', '-translate-x-full');
+        // add backdrop for mobile
+        if (!document.getElementById('sidebar-backdrop')) {
+          const bg = document.createElement('div');
+          bg.id = 'sidebar-backdrop';
+          bg.className = 'fixed inset-0 bg-black bg-opacity-50 z-30 md:hidden';
+          bg.addEventListener('click', closeSidebar);
+          document.body.appendChild(bg);
+        }
+      }
+    
+      function closeSidebar() {
+        sidebar.classList.add('-translate-x-full', 'hidden');
+        const bg = document.getElementById('sidebar-backdrop');
+        if (bg) bg.remove();
+      }
+    
+      if (menuBtn) menuBtn.addEventListener('click', openSidebar);
+      if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+    
+      // safety: allow Escape key to close
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSidebar(); });
+    });
+    </script>
+    
+
+
+        
 </body>
 </html>
