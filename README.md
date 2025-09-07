@@ -87,7 +87,7 @@ You’ve got two options:
 - 🔇 **Sound is broken** (might be unfixable, TCG doesn’t like us)  
 - 🔑 **No VNC password** yet (planned, maybe)  
 - 💤 **No snapshot support** (not my problem)  
-- 🔥 **Performance + heat:** x86 on ARM = TCG hell. Expect lag + hot phone.  
+- 🔥 **Performance + heat:** x86 on ARM = TCG hell. Expect lag + hot phone. (so don't expect miracles)
 
 ---
 
