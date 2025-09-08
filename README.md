@@ -40,8 +40,8 @@ Run the following commands:
 
 ```bash
 cd ~/downloads
-chmod +x install.sh
-./install.sh
+chmod +x phoenix.sh
+sh phoenix.sh 
 ```
 
 ---
