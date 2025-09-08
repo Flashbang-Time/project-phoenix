@@ -88,6 +88,7 @@ You’ve got two options:
 - 🔑 **No VNC password** yet (planned, maybe)  
 - 💤 **No snapshot support** (not my problem)  
 - 🔥 **Performance + heat:** x86 on ARM = TCG hell. Expect lag + hot phone. (so don't expect miracles)
+- 🎰 The boot order might be broken, keep on "C" just in case, i haven't tested it in a while :)
 
 ---
 
