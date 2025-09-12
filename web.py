@@ -27,12 +27,9 @@ DEFAULT_BOOT_ORDER = "c"
 DEFAULT_VGA_MODEL = "virtio"
 DEFAULT_NET_DEVICE = "virtio-net-pci"
 DEFAULT_USB_DEVICES = []
-DEFAULT_WEBSOCK_IP_1 = "127.0.0.1:5901"
-DEFAULT_WEBSOCK_IP_2 = "127.0.0.1:5900"
+#DEFAULT_WEBSOCK_IP_1 = "127.0.0.1:5901"
+#DEFAULT_WEBSOCK_IP_2 = "127.0.0.1:5900"
 
-
-# Prints confirmation 2 times, i don't know, if someone knows
-# make an issue on github
 
 BASE_QEMU_COMMAND_TEMPLATE = (
     "qemu-system-x86_64 "
@@ -45,19 +42,14 @@ BASE_QEMU_COMMAND_TEMPLATE = (
     "-device {net_device},netdev=net0 "
 )
 
-print("QEMU_BASE config valid!")
+#print("QEMU_BASE config valid!")
 
-QEMU_DEPENDS = (
-    "websockify {websock_ip_1} {websock_ip_2} "
-)
+# QEMU_DEPENDS = (
+#    "websockify {websock_ip_1} {websock_ip_2} "
+#)
 
-print("QEMU_DEPENDS config valid!")
-
-# Spaces for visibility
-
-print("                     ")
+#print("QEMU_DEPENDS config valid!")
 #print("                     ")
-#print
 
 
 # --- END QEMU CONFIGURATION ---
@@ -106,7 +98,7 @@ def run_qemu_in_thread(command_str):
         error_msg = f"ERROR(QEMU_THREAD): An unexpected error occurred while trying to run QEMU: {e}"
         print(error_msg, file=sys.stderr)
         QEMU_OUTPUT_QUEUE.put(error_msg)
-    finally:
+    finally:    
         QEMU_RUNNING_STATUS = False
         QEMU_PROCESS = None
         print("DEBUG(QEMU_THREAD): QEMU process has terminated.")
@@ -160,14 +152,7 @@ def novnc_index():
 def novnc_files(filename):
     return send_from_directory(os.path.join(basedir, ''), filename)
 
-@app.route('/vncgui')
-def serve_vncgui():
-    try:
-        with open(os.path.join(basedir, 'vncgui.html'), 'r') as f:
-            html_content = f.read()
-        return render_template_string(html_content)
-    except FileNotFoundError:
-        return "Error: vncgui.html not found in directory", 404
+
 
 @app.route('/terminal')
 def serve_terminal():
@@ -198,7 +183,8 @@ def start_vm():
         cpu_model = str(data.get('cpu_model', DEFAULT_CPU_MODEL))
         boot_order = str(data.get('boot_order', DEFAULT_BOOT_ORDER))
         vga_model = str(data.get('vga_model', DEFAULT_VGA_MODEL))
-        net_device = str(data.get('net_device', DEFAULT_NET_DEVICE))
+        #websock_ip_1 = str(data.get('websock_ip_1', DEFAULT_WEBSOCK_IP_1))
+        #websock_ip_2 = str(data.get('websock_ip_2', DEFAULT_WEBSOCK_IP_2))
         
         primary_disk_path = str(data.get('primary_disk_path', DEFAULT_PRIMARY_DISK_PATH)).strip()
         cdrom_path = str(data.get('cdrom_path', DEFAULT_CDROM_PATH)).strip()
@@ -311,14 +297,17 @@ def start_vm():
     return jsonify({"status": status, "message": message}), 200
 
 
-    @app.route('/stop_vm', methods=['POST'])
-    def stop_vm():
-        global QEMU_PROCESS, QEMU_RUNNING_STATUS
-        if QEMU_PROCESS:
-            try:
-                QEMU_PROCESS.kill()
-                QEMU_PROCESS = None
-                QEMU_RUNNING_STATUS = False
+
+@app.route('/stop_vm', methods=['POST'])
+def stop_vm():
+    global QEMU_PROCESS
+    if QEMU_PROCESS is not None:
+        QEMU_PROCESS.terminate()  
+        try:
+            QEMU_PROCESS.wait(timeout=5) 
+        except subprocess.TimeoutExpired:
+            QEMU_PROCESS.kill() 
+        QEMU_PROCESS = None
                 return jsonify({"status": "success", "message": "VM stopped successfully."}), 200
             except Exception as e:
                 return jsonify({"status": "error", "message": f"Failed to stop VM: {e}"}), 500
