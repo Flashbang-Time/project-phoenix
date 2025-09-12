@@ -65,7 +65,7 @@ win10.qcow2
 
 You’ve got two options:
 
-1. **Built-in browser VNC viewer** (runs inside the web UI)  
+1. ~~**Built-in browser VNC viewer** (runs inside the web UI)~~  
 2. **External VNC client** → connect to `127.0.0.1:5900`
 
 ---
