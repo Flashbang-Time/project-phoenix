@@ -1,4 +1,4 @@
-# Project Phoenix Mobile
+# Project Phoenix Mobile (THIS IS VERY BROKEN!)
 
 A React Native mobile application for controlling Project Phoenix QEMU VMs running on Android via Termux.
 
