@@ -1,0 +1,9 @@
+{
+  "name": "project-phoenix",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Project Phoenix - VM control application",
+  "scripts": {
+    "build": "echo 'No build needed for root project'"
+  }
+}
