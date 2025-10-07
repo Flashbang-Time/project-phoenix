@@ -302,17 +302,17 @@ def start_vm():
 def stop_vm():
     global QEMU_PROCESS
     if QEMU_PROCESS is not None:
-        QEMU_PROCESS.terminate()  
         try:
-            QEMU_PROCESS.wait(timeout=5) 
+            QEMU_PROCESS.terminate()
+            QEMU_PROCESS.wait(timeout=5)
         except subprocess.TimeoutExpired:
-            QEMU_PROCESS.kill() 
+            QEMU_PROCESS.kill()
+        except Exception as e:
+            return jsonify({"status": "error", "message": f"Failed to stop VM: {e}"}), 500
         QEMU_PROCESS = None
-                return jsonify({"status": "success", "message": "VM stopped successfully."}), 200
-            except Exception as e:
-                return jsonify({"status": "error", "message": f"Failed to stop VM: {e}"}), 500
-        else:
-            return jsonify({"status": "info", "message": "VM is not running."}), 200
+        return jsonify({"status": "success", "message": "VM stopped successfully."}), 200
+    else:
+        return jsonify({"status": "info", "message": "VM is not running."}), 200
 
 
 
