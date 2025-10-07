@@ -183,9 +183,8 @@ def start_vm():
         cpu_model = str(data.get('cpu_model', DEFAULT_CPU_MODEL))
         boot_order = str(data.get('boot_order', DEFAULT_BOOT_ORDER))
         vga_model = str(data.get('vga_model', DEFAULT_VGA_MODEL))
-        #websock_ip_1 = str(data.get('websock_ip_1', DEFAULT_WEBSOCK_IP_1))
-        #websock_ip_2 = str(data.get('websock_ip_2', DEFAULT_WEBSOCK_IP_2))
-        
+        net_device = str(data.get('net_device', DEFAULT_NET_DEVICE))
+
         primary_disk_path = str(data.get('primary_disk_path', DEFAULT_PRIMARY_DISK_PATH)).strip()
         cdrom_path = str(data.get('cdrom_path', DEFAULT_CDROM_PATH)).strip()
         data_disk_path = str(data.get('data_disk_path', DEFAULT_DATA_DISK_PATH)).strip()
