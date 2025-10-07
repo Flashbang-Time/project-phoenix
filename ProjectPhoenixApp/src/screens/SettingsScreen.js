@@ -12,7 +12,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SettingsScreen = () => {
-  const [serverUrl, setServerUrl] = useState('http://127.0.0.1:5000');
+  const [serverUrl, setServerUrl] = useState('http://192.168.1.100:5000');
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [refreshInterval, setRefreshInterval] = useState('5');
   const [keepScreenOn, setKeepScreenOn] = useState(false);
@@ -60,7 +60,7 @@ const SettingsScreen = () => {
           text: 'Reset',
           style: 'destructive',
           onPress: () => {
-            setServerUrl('http://127.0.0.1:5000');
+            setServerUrl('http://192.168.1.100:5000');
             setAutoRefresh(true);
             setRefreshInterval('5');
             setKeepScreenOn(false);
@@ -94,13 +94,13 @@ const SettingsScreen = () => {
             style={styles.input}
             value={serverUrl}
             onChangeText={setServerUrl}
-            placeholder="http://127.0.0.1:5000"
+            placeholder="http://192.168.x.x:5000"
             placeholderTextColor="#9ca3af"
             autoCapitalize="none"
             autoCorrect={false}
           />
           <Text style={styles.helpText}>
-            The URL where your Project Phoenix server is running
+            Enter your device's local network IP address. In Termux, run: ifconfig or ip addr
           </Text>
         </View>
 

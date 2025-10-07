@@ -52,7 +52,7 @@ const VNCScreen = () => {
           </TouchableOpacity>
         </View>
         <WebView
-          source={{ uri: 'http://127.0.0.1:5000/noVNC/' }}
+          source={{ uri: `${ApiService.baseUrl}/noVNC/` }}
           style={styles.webview}
           javaScriptEnabled={true}
           domStorageEnabled={true}
@@ -85,7 +85,7 @@ const VNCScreen = () => {
           Connect to your VM's desktop through VNC. Make sure the VM is running before attempting to connect.
         </Text>
         <Text style={styles.infoText}>
-          VNC Server: 127.0.0.1:5900
+          VNC connects through the configured server URL
         </Text>
       </View>
 
