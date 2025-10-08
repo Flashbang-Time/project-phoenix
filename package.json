@@ -4,6 +4,6 @@
   "private": true,
   "description": "Project Phoenix - VM control application",
   "scripts": {
-    "build": "echo 'No build needed for root project'"
+    "build": "echo 'Project Phoenix build complete'"
   }
 }
