@@ -12,7 +12,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SettingsScreen = () => {
-  const [serverUrl, setServerUrl] = useState('http://192.168.1.100:5000');
+  const [serverUrl, setServerUrl] = useState('https://localhost:5000');
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [refreshInterval, setRefreshInterval] = useState('5');
   const [keepScreenOn, setKeepScreenOn] = useState(false);

@@ -10,6 +10,7 @@ import threading
 import time
 import queue
 import re
+import ssl
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
@@ -434,8 +435,27 @@ if __name__ == '__main__':
     print("=" * 60)
     print("Project Phoenix Backend Server")
     print("=" * 60)
-    print(f"Starting server on 0.0.0.0:5000")
-    print(f"VM Running: {QEMU_RUNNING}")
-    print("=" * 60)
 
-    app.run(host='0.0.0.0', port=5000, debug=False, threaded=True)
+    # Check if SSL certificates exist
+    cert_path = 'cert.pem'
+    key_path = 'key.pem'
+
+    if os.path.exists(cert_path) and os.path.exists(key_path):
+        print(f"Starting HTTPS server on 0.0.0.0:5000")
+        print(f"Certificates found: Using HTTPS")
+        print(f"VM Running: {QEMU_RUNNING}")
+        print("=" * 60)
+
+        ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        ssl_context.load_cert_chain(cert_path, key_path)
+
+        app.run(host='0.0.0.0', port=5000, debug=False, threaded=True, ssl_context=ssl_context)
+    else:
+        print(f"Starting HTTP server on 0.0.0.0:5000")
+        print(f"WARNING: No SSL certificates found. Using HTTP.")
+        print(f"To enable HTTPS, generate certificates with:")
+        print(f"  openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 365")
+        print(f"VM Running: {QEMU_RUNNING}")
+        print("=" * 60)
+
+        app.run(host='0.0.0.0', port=5000, debug=False, threaded=True)
