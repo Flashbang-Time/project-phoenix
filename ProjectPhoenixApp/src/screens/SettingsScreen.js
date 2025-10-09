@@ -60,7 +60,7 @@ const SettingsScreen = () => {
           text: 'Reset',
           style: 'destructive',
           onPress: () => {
-            setServerUrl('http://192.168.1.100:5000');
+            setServerUrl('https://localhost:5000');
             setAutoRefresh(true);
             setRefreshInterval('5');
             setKeepScreenOn(false);
@@ -72,14 +72,31 @@ const SettingsScreen = () => {
 
   const testConnection = async () => {
     try {
-      const response = await fetch(`${serverUrl}/vm_status`);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+      const response = await fetch(`${serverUrl}/health`, {
+        method: 'GET',
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
       if (response.ok) {
-        Alert.alert('Success', 'Connection to server successful!');
+        const data = await response.json();
+        Alert.alert('Success', `Connected! Server status: ${data.status}`);
       } else {
-        Alert.alert('Error', 'Server responded with an error');
+        Alert.alert('Error', `Server returned status ${response.status}`);
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to connect to server. Check the URL and make sure the server is running.');
+      if (error.name === 'AbortError') {
+        Alert.alert('Timeout', 'Connection timeout. Make sure server is running and reachable.');
+      } else {
+        Alert.alert(
+          'Connection Failed',
+          `Cannot connect to server.\n\nError: ${error.message}\n\nTroubleshooting:\n• Check server is running\n• Verify URL is correct\n• Both devices on same network\n• For HTTPS: certificate issues are common with self-signed certs`
+        );
+      }
     }
   };
 
@@ -94,13 +111,13 @@ const SettingsScreen = () => {
             style={styles.input}
             value={serverUrl}
             onChangeText={setServerUrl}
-            placeholder="http://192.168.x.x:5000"
+            placeholder="https://localhost:5000"
             placeholderTextColor="#9ca3af"
             autoCapitalize="none"
             autoCorrect={false}
           />
           <Text style={styles.helpText}>
-            Enter your device's local network IP address. In Termux, run: ifconfig or ip addr
+            Use https://hostname:5000 or https://IP:5000. For HTTPS with self-signed certs, certificate errors are expected.
           </Text>
         </View>
 

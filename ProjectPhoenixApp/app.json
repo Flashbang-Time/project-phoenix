@@ -31,6 +31,7 @@
         "android.permission.WAKE_LOCK"
       ],
       "usesCleartextTraffic": true,
+      "networkSecurityConfig": "./network_security_config.xml",
       "edgeToEdgeEnabled": true
     },
     "web": {

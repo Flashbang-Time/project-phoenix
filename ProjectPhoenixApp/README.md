@@ -41,10 +41,31 @@ A React Native mobile application for controlling Project Phoenix QEMU VMs runni
 
 ## Configuration
 
-1. Open the app and go to the **Settings** tab
-2. Set the **Server URL** to match your Project Phoenix server (default: `http://127.0.0.1:5000`)
-3. Test the connection to ensure it's working
-4. Configure other preferences as needed
+### First-time Setup
+
+1. **On Termux device**: Run the HTTPS setup script
+   ```bash
+   cd /path/to/project
+   ./setup_https.sh
+   ```
+
+2. **Start the backend server**:
+   ```bash
+   python backend.py
+   ```
+
+3. **In the mobile app**:
+   - Open the app and go to the **Settings** tab
+   - Set **Server URL** to: `https://localhost:5000` or `https://YOUR-IP:5000`
+   - Tap **Test Connection**
+   - If successful, tap **Save Settings**
+
+### Important Notes
+
+- The app **requires HTTPS** (not HTTP)
+- Self-signed certificates are supported but may show warnings
+- Use hostname (localhost) or IP address with HTTPS
+- Both HTTP and HTTPS work, but HTTPS is strongly recommended
 
 ## Usage
 
@@ -74,9 +95,21 @@ This app requires the Project Phoenix Flask server to be running. Make sure:
 ## Troubleshooting
 
 ### Connection Issues
-- Verify the server URL in Settings
-- Check that the Project Phoenix server is running
-- Ensure your device is on the same network as the server
+
+**"Network request failed" errors:**
+- Make sure server URL uses `https://` (not `http://`)
+- Verify server is running: `curl -k https://localhost:5000/health`
+- Check both devices are on same WiFi network
+- Try using IP address instead of hostname if resolution fails
+
+**Certificate errors with HTTPS:**
+- This is normal with self-signed certificates
+- The app is configured to accept them
+- Rebuild the app after configuration changes
+
+**Can't connect with hostname:**
+- Use IP address instead: `https://192.168.x.x:5000`
+- Find your IP: `ip addr show wlan0 | grep inet`
 
 ### VNC Problems
 - Make sure the VM is running before connecting
