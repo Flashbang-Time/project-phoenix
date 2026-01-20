@@ -1,12 +1,11 @@
 
 
-![alt text]([https://cdn.discordapp.com/attachments/1047608068659224648/1407380771714371614/Your_paragraph_text_20250819_180544_0000.png?ex=68d55afb&is=68d4097b&hm=49363736d7327435959d4c55913f3cb37e192ae20ce450d8d5e2df9de541ebdb&](https://media.discordapp.net/attachments/1047608068659224648/1388179605604663468/Your_paragraph_text.png?ex=69704841&is=696ef6c1&hm=6eccbb9000ac7fb378659422d8a2a89993b421a76825e02d62ececa774f3e09d&=&format=webp&quality=lossless))
+![alt text](https://cdn.discordapp.com/attachments/1047608068659224648/1407380771714371614/Your_paragraph_text_20250819_180544_0000.png?ex=68d55afb&is=68d4097b&hm=49363736d7327435959d4c55913f3cb37e192ae20ce450d8d5e2df9de541ebdb&](https://media.discordapp.net/attachments/1047608068659224648/1388179605604663468/Your_paragraph_text.png?ex=69704841&is=696ef6c1&hm=6eccbb9000ac7fb378659422d8a2a89993b421a76825e02d62ececa774f3e09d&=&format=webp&quality=lossless)](https://imgur.com/a/Va4dsBn)
 
 
 
 # 🚀 Project Phoenix – Windows VM on Android (via Termux)
 
-**Experience full Windows on the go!**  
 Project Phoenix transforms your Android device into a control center + QEMU VM host, complete with a touch-friendly web interface.
 
 ⚡ Run lightweight Windows builds, legacy apps, or just enjoy a desktop environment — all from your phone.
