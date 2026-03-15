@@ -1,6 +1,6 @@
 
 
-![alt text](https://media.discordapp.net/attachments/1047608068659224648/1388179605604663468/Your_paragraph_text.png?ex=69704841&is=696ef6c1&hm=6eccbb9000ac7fb378659422d8a2a89993b421a76825e02d62ececa774f3e09d&=&format=webp&quality=lossless)
+![alt text](https://cdn.discordapp.com/attachments/1047608068659224648/1407380771714371614/Your_paragraph_text_20250819_180544_0000.png?ex=69b81cfb&is=69b6cb7b&hm=db0317f3d66f569fa950f12ed465e9afd59028015f83bec85cc4fba513d994eb&)
 
 
 
